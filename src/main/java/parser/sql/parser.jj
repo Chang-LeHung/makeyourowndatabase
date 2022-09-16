@@ -1,0 +1,152 @@
+
+
+
+options {
+    STATIC = false ;
+    IGNORE_CASE = true;
+}
+
+PARSER_BEGIN(SQLParser)
+    package parser.sql;
+    import java.io.PrintStream ;
+    class SQLParser {
+        public static void main( String[] args )
+            throws NumberFormatException, NumberFormatException {
+            SQLParser parser = new SQLParser( System.in ) ;
+            parser.parse() ;
+        }
+    }
+PARSER_END(SQLParser)
+
+
+SKIP : { " " | "\n" | "\r" | "\r\n" | "\t"}
+TOKEN : { < SEMI : ";" > }
+
+TOKEN : { < PLUS : "+" > }
+TOKEN : { < TIMES : "*" > }
+TOKEN : { < DIV : "/" > }
+TOKEN : { < MINUS : "-" > }
+TOKEN : { < AND : "&">}
+TOKEN : { < OR : "|">}
+TOKEN : { < GT : ">">}
+TOKEN : { < LT : "<">}
+TOKEN : { < EQ : "=">}
+TOKEN : { < GE : ">=">}
+TOKEN : { < LE : "<=">}
+
+
+
+TOKEN : { < NUMBER : <DIGITS>
+                   | <DIGITS> "." <DIGITS>
+                   | <DIGITS> "."
+                   | "." <DIGITS>
+                   >
+        }
+TOKEN : { < #DIGITS : (["0"-"9"])+ > }
+
+TOKEN : { <CREATE : "CREATE">}
+TOKEN : { <DROP   : "DROP"  >}
+TOKEN : { <UPDATE : "UPDATE">}
+TOKEN : { <DELETE : "DELETE">}
+TOKEN : { <SELECT : "SELECT">}
+TOKEN : { <INSERT : "INSERT">}
+
+
+void parse() throws NumberFormatException :
+{
+}
+{
+    {Token token;}
+    token = primary()
+    {
+      if (token.image.equalsIgnoreCase("select")) {
+          System.out.println("match");
+          token = primary();
+          System.out.println(token.image);
+      }
+    }
+    <EOF>
+}
+
+//Token expression():
+//{
+//  Token t;
+//}
+//{
+//    {return t;}
+//}
+
+Token primary():
+{
+  Token t;
+}
+{
+    t = <CREATE> | t = <DELETE> | t = <UPDATE> | t = <DROP> | t = <SELECT>
+    {return t;}
+}
+
+//
+//double Expression() throws NumberFormatException : {
+//    double i = 0;
+//    double value =0 ;
+//    boolean flag = false;
+//}
+//{
+//    (
+//        <MINUS>
+//        {flag = true;}
+//    )*
+//    (value = Term())
+//    {
+//      if (flag)
+//        value = -value;
+//    }
+//    (
+//        (
+//            <PLUS>
+//            i = Term()
+//            { value += i ; }
+//        )
+//        |
+//        (
+//            <MINUS>
+//            i = Term()
+//            {value -= i;}
+//        )
+//    )*
+//    { return value ; }
+//}
+//
+//double Term() throws NumberFormatException :
+//{
+//    double i = 0;
+//    double j = 0;
+//    Token t ;
+//}
+//{
+//    i = Prmiary()
+//    (
+//        (
+//            <TIMES>
+//            j = Prmiary()
+//            {i *= j;}
+//        )
+//        |
+//        (
+//            <DIV>
+//            j = Prmiary()
+//            {i /= j;}
+//        )
+//    )*
+//    {return i;}
+//}
+//
+//
+//double Prmiary() throws NumberFormatException :
+//{
+//    Token t ;
+//}
+//{
+//    t = <NUMBER>
+//    { return Double.parseDouble( t.image ) ; }
+//}
