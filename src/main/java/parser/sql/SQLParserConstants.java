@@ -13,9 +13,9 @@ public interface SQLParserConstants {
   /** RegularExpression Id. */
   int SEMI = 6;
   /** RegularExpression Id. */
-  int PLUS = 7;
+  int COMMA = 7;
   /** RegularExpression Id. */
-  int TIMES = 8;
+  int PLUS = 8;
   /** RegularExpression Id. */
   int DIV = 9;
   /** RegularExpression Id. */
@@ -37,19 +37,31 @@ public interface SQLParserConstants {
   /** RegularExpression Id. */
   int NUMBER = 18;
   /** RegularExpression Id. */
-  int DIGITS = 19;
+  int FROM = 19;
   /** RegularExpression Id. */
-  int CREATE = 20;
+  int SELECT = 20;
   /** RegularExpression Id. */
-  int DROP = 21;
+  int DELETE = 21;
   /** RegularExpression Id. */
   int UPDATE = 22;
   /** RegularExpression Id. */
-  int DELETE = 23;
+  int CREATE = 23;
   /** RegularExpression Id. */
-  int SELECT = 24;
+  int DROP = 24;
   /** RegularExpression Id. */
-  int INSERT = 25;
+  int WHERE = 25;
+  /** RegularExpression Id. */
+  int INSERT = 26;
+  /** RegularExpression Id. */
+  int STAR = 27;
+  /** RegularExpression Id. */
+  int DIGITS = 28;
+  /** RegularExpression Id. */
+  int CHARACTER = 29;
+  /** RegularExpression Id. */
+  int STRING = 30;
+  /** RegularExpression Id. */
+  int IDENTIFIER = 31;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -63,8 +75,8 @@ public interface SQLParserConstants {
     "\"\\r\\n\"",
     "\"\\t\"",
     "\";\"",
+    "\",\"",
     "\"+\"",
-    "\"*\"",
     "\"/\"",
     "\"-\"",
     "\"&\"",
@@ -75,13 +87,19 @@ public interface SQLParserConstants {
     "\">=\"",
     "\"<=\"",
     "<NUMBER>",
-    "<DIGITS>",
+    "\"FROM\"",
+    "\"SELECT\"",
+    "\"DELETE\"",
+    "\"UPDATE\"",
     "\"CREATE\"",
     "\"DROP\"",
-    "\"UPDATE\"",
-    "\"DELETE\"",
-    "\"SELECT\"",
+    "\"WHERE\"",
     "\"INSERT\"",
+    "\"*\"",
+    "<DIGITS>",
+    "<CHARACTER>",
+    "<STRING>",
+    "<IDENTIFIER>",
   };
 
 }

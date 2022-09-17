@@ -4,26 +4,75 @@
 options {
     STATIC = false ;
     IGNORE_CASE = true;
+//    LOOKAHEAD = 2;  // 全局设置
 }
 
 PARSER_BEGIN(SQLParser)
     package parser.sql;
-    import java.io.PrintStream ;
-    class SQLParser {
-        public static void main( String[] args )
-            throws NumberFormatException, NumberFormatException {
-            SQLParser parser = new SQLParser( System.in ) ;
-            parser.parse() ;
+import java.io.PrintStream ;
+import parser.sql.utils.*;
+import java.util.ArrayList;
+class SQLParser {
+    public static void main( String[] args )
+        throws NumberFormatException, ParseException {
+        SQLParser parser = new SQLParser( System.in ) ;
+        Token token = parser.firstKeyWord();
+        ReserveWord rw = parser.checkToken(token);
+        if (Utils.startKeyWord.contains(rw)) {
+          switch (rw) {
+            case SELECT:
+              Select select = new Select();
+              parser.parseSelect(select);
+              System.out.println(select.getQueryItem());
+              System.out.println(select.getTableName());
+              System.out.println(select.getConditions());
+              break;
+            case DELETE:
+              break;
+            case UPDATE:
+              break;
+            case CREATE:
+              break;
+            case DROP:
+              break;
+            }
+        }else {
+          throw new RuntimeException("sql statement must start with keyword select, delete, update, drop, create");
         }
     }
+
+    public ReserveWord checkToken(Token token) {
+      if (token.image.equalsIgnoreCase("create")) {
+        return ReserveWord.CREATE;
+      }else if (token.image.equalsIgnoreCase("insert")) {
+        return ReserveWord.INSERT;
+      }else if (token.image.equalsIgnoreCase("update")) {
+        return ReserveWord.UPDATE;
+      }else if (token.image.equalsIgnoreCase("select")) {
+        return ReserveWord.SELECT;
+      }else if (token.image.equalsIgnoreCase("delete")) {
+        return ReserveWord.DELETE;
+      }else if (token.image.equalsIgnoreCase("drop")) {
+        return ReserveWord.DROP;
+      }else if (token.image.equalsIgnoreCase("from")) {
+        return ReserveWord.FROM;
+      }else if (token.image.equalsIgnoreCase("join")) {
+        return ReserveWord.JOIN;
+      }else if (token.image.equalsIgnoreCase("where")){
+        return ReserveWord.WHERE;
+      }else{
+        return ReserveWord.IDENTIFIER;
+      }
+    }
+}
 PARSER_END(SQLParser)
 
 
 SKIP : { " " | "\n" | "\r" | "\r\n" | "\t"}
 TOKEN : { < SEMI : ";" > }
+TOKEN : { <COMMA : "," > }
 
 TOKEN : { < PLUS : "+" > }
-TOKEN : { < TIMES : "*" > }
 TOKEN : { < DIV : "/" > }
 TOKEN : { < MINUS : "-" > }
 TOKEN : { < AND : "&">}
@@ -42,111 +91,155 @@ TOKEN : { < NUMBER : <DIGITS>
                    | "." <DIGITS>
                    >
         }
+
+TOKEN : { < FROM : "FROM"> }
+TOKEN : { < SELECT : "SELECT"> }
+TOKEN : { < DELETE : "DELETE"> }
+TOKEN : { < UPDATE : "UPDATE"> }
+TOKEN : { < CREATE : "CREATE"> }
+TOKEN : { < DROP : "DROP"> }
+TOKEN : { < WHERE : "WHERE"> }
+TOKEN : { < INSERT : "INSERT"> }
+
+
+TOKEN : { <STAR : "*">}
 TOKEN : { < #DIGITS : (["0"-"9"])+ > }
+TOKEN : { < #CHARACTER : ["a"-"z", "A"-"Z"] >}
+TOKEN : { <STRING : ("\"" | "\'")(<CHARACTER>)+("\"" | "\'")>}
+TOKEN : { < IDENTIFIER :  (<CHARACTER> (<CHARACTER> | <NUMBER> )*) >}
 
-TOKEN : { <CREATE : "CREATE">}
-TOKEN : { <DROP   : "DROP"  >}
-TOKEN : { <UPDATE : "UPDATE">}
-TOKEN : { <DELETE : "DELETE">}
-TOKEN : { <SELECT : "SELECT">}
-TOKEN : { <INSERT : "INSERT">}
-
-
-void parse() throws NumberFormatException :
-{
-}
-{
-    {Token token;}
-    token = primary()
-    {
-      if (token.image.equalsIgnoreCase("select")) {
-          System.out.println("match");
-          token = primary();
-          System.out.println(token.image);
-      }
-    }
-    <EOF>
-}
-
-//Token expression():
-//{
-//  Token t;
-//}
-//{
-//    {return t;}
-//}
 
 Token primary():
 {
-  Token t;
+  Token t = null;
 }
 {
-    t = <CREATE> | t = <DELETE> | t = <UPDATE> | t = <DROP> | t = <SELECT>
+    (t = <IDENTIFIER>) // 语句最好用()包裹
+    {
+      System.out.println(t.image);
+      return t;
+    }
+}
+
+Token firstKeyWord() :
+{
+      Token t = null;
+}
+{
+    (
+        t = <SELECT> |
+        t = <INSERT> |
+        t = <UPDATE> |
+        t = <DROP> |
+        t = <CREATE>
+        t = <DELETE>
+    )
+
     {return t;}
 }
 
-//
-//double Expression() throws NumberFormatException : {
-//    double i = 0;
-//    double value =0 ;
-//    boolean flag = false;
-//}
-//{
-//    (
-//        <MINUS>
-//        {flag = true;}
-//    )*
-//    (value = Term())
-//    {
-//      if (flag)
-//        value = -value;
-//    }
-//    (
-//        (
-//            <PLUS>
-//            i = Term()
-//            { value += i ; }
-//        )
-//        |
-//        (
-//            <MINUS>
-//            i = Term()
-//            {value -= i;}
-//        )
-//    )*
-//    { return value ; }
-//}
-//
-//double Term() throws NumberFormatException :
-//{
-//    double i = 0;
-//    double j = 0;
-//    Token t ;
-//}
-//{
-//    i = Prmiary()
-//    (
-//        (
-//            <TIMES>
-//            j = Prmiary()
-//            {i *= j;}
-//        )
-//        |
-//        (
-//            <DIV>
-//            j = Prmiary()
-//            {i /= j;}
-//        )
-//    )*
-//    {return i;}
-//}
-//
-//
-//double Prmiary() throws NumberFormatException :
-//{
-//    Token t ;
-//}
-//{
-//    t = <NUMBER>
-//    { return Double.parseDouble( t.image ) ; }
-//}
+void parseSelect(Select select):
+{
+  Token t = null;
+}
+{
+    (
+        LOOKAHEAD(2) // 局部设置
+        t = <IDENTIFIER>
+        <COMMA>
+        {select.addQueryItem(t.image);}
+    )*
+    (
+        t = <IDENTIFIER> |
+        t = <STAR>
+    )
+    {select.addQueryItem(t.image);}
+    <FROM>
+    t = <IDENTIFIER>
+    {select.setTableName(t.image);}
+    (
+        <WHERE>
+        {select.setConditions(new ArrayList<QueryCondition>());}
+        addCondition(select)
+    )?
+}
+
+void addCondition(Select select):
+{
+  Token t = null;
+}
+{
+    (
+        LOOKAHEAD(4)
+        t = <IDENTIFIER>
+        {
+          QueryCondition condition = new QueryCondition();
+          condition.setIdentifier(t.image);
+        }
+        (
+            t = <GT> |
+            t = <LT> |
+            t = <GE> |
+            t = <LE> |
+            t = <EQ>
+        )
+        {
+          String s = t.image;
+          if (t.image.equalsIgnoreCase(">"))
+            condition.setSymbol(Symbol.GT);
+          else if (t.image.equalsIgnoreCase("<"))
+            condition.setSymbol(Symbol.LT);
+          else if (t.image.equalsIgnoreCase("="))
+            condition.setSymbol(Symbol.EQUAL);
+          else if (t.image.equalsIgnoreCase(">="))
+            condition.setSymbol(Symbol.GE);
+          else
+            condition.setSymbol(Symbol.LE);
+        }
+        (
+            t = <NUMBER> |
+            t = <STRING>
+        )
+        {
+          condition.setValue(t.image);
+          select.addCondition(condition);
+        }
+        <AND>
+
+    )*
+
+
+    t = <IDENTIFIER>
+    {
+      QueryCondition condition = new QueryCondition();
+      condition.setIdentifier(t.image);
+    }
+    (
+        t = <GT> |
+        t = <LT> |
+        t = <GE> |
+        t = <LE> |
+        t = <EQ>
+    )
+    {
+      String s = t.image;
+      if (t.image.equalsIgnoreCase(">"))
+        condition.setSymbol(Symbol.GT);
+      else if (t.image.equalsIgnoreCase("<"))
+        condition.setSymbol(Symbol.LT);
+      else if (t.image.equalsIgnoreCase("="))
+        condition.setSymbol(Symbol.EQUAL);
+      else if (t.image.equalsIgnoreCase(">="))
+        condition.setSymbol(Symbol.GE);
+      else
+        condition.setSymbol(Symbol.LE);
+    }
+    (
+        t = <NUMBER> |
+        t = <STRING>
+    )
+    {
+      condition.setValue(t.image);
+      select.addCondition(condition);
+    }
+}

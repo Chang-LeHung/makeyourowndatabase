@@ -8,6 +8,12 @@ public class Select extends SQLStatement {
 
   private String tableName;
 
+
+  public ArrayList<String> getQueryItem() {
+    return queryItem;
+  }
+
+
   private ArrayList<QueryCondition> conditions;
 
   public Select() {
@@ -28,5 +34,13 @@ public class Select extends SQLStatement {
 
   public void setConditions(ArrayList<QueryCondition> conditions) {
     this.conditions = conditions;
+  }
+
+  public void addQueryItem(String name) {
+    queryItem.add(name);
+  }
+
+  public void addCondition(QueryCondition queryCondition) {
+    conditions.add(queryCondition);
   }
 }

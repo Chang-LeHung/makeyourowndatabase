@@ -1,6 +1,6 @@
 package parser.sql.utils;
 
-public enum KeyWord {
+public enum ReserveWord {
   SELECT,
   INSERT,
   UPDATE,
@@ -11,5 +11,6 @@ public enum KeyWord {
   JOIN,
   AND,
   OR,
-  FROM
+  FROM,
+  IDENTIFIER // not keyword but identifier
 }

@@ -2,13 +2,13 @@ package parser.sql.utils;
 
 public class SQLStatement {
 
-  KeyWord start;
+  ReserveWord start;
 
-  public KeyWord getStart() {
+  public ReserveWord getStart() {
     return start;
   }
 
-  public void setStart(KeyWord start) {
+  public void setStart(ReserveWord start) {
     this.start = start;
   }
 }
