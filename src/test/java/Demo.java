@@ -10,6 +10,9 @@ public class Demo {
       case C:
         System.out.println("C");
     }
+    if (true && false || false) {
+
+    }
   }
 }
 
