@@ -22,6 +22,8 @@ expression: expression op=('*'|'/') expression                  # MulDiv
     | INT                                                       # PInt
     | '-' INT                                                   # NInt
     | ID                                                        # ID
+    | '\'' ID '\''                                              # SingleString
+    | '"' ID '"'                                                # DoubleString
     | ID '(' expression (',' expression)* ')'                   # Function
     | '(' expression ')'                                        # Parens
     | FLOAT                                                     # PFloat

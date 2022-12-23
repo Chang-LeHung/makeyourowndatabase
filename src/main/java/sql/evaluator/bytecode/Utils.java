@@ -19,4 +19,32 @@ public class Utils {
   public static int dataToInt(DataType data) {
     return ((Int)data).getVal();
   }
+
+  /**
+   *
+   * @param o1 data 1
+   * @param o2 data 2
+   * @return o1 < o2
+   */
+  public static boolean compare(DataType o1, DataType o2) {
+    if (o1 instanceof Int) {
+      int i1 = ((Int)o1).getVal();
+      if (o2 instanceof Int) {
+        int i2 = ((Int)o1).getVal();
+        return i1 < i2;
+      }else {
+        float i2 = ((Float)o2).getVal();
+        return i1 < i2;
+      }
+    }else {
+      float i1 = ((Float)o1).getVal();
+      if (o2 instanceof Int) {
+        int i2 = ((Int)o2).getVal();
+        return i1 < i2;
+      }else {
+        float i2 = ((Float)o2).getVal();
+        return i1 < i2;
+      }
+    }
+  }
 }

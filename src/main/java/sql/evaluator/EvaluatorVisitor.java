@@ -95,6 +95,13 @@ public interface EvaluatorVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitFunction(EvaluatorParser.FunctionContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code SingleString}
+	 * labeled alternative in {@link EvaluatorParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSingleString(EvaluatorParser.SingleStringContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code NInt}
 	 * labeled alternative in {@link EvaluatorParser#expression}.
 	 * @param ctx the parse tree
@@ -122,6 +129,13 @@ public interface EvaluatorVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitParens(EvaluatorParser.ParensContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code DoubleString}
+	 * labeled alternative in {@link EvaluatorParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDoubleString(EvaluatorParser.DoubleStringContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code NFloat}
 	 * labeled alternative in {@link EvaluatorParser#expression}.

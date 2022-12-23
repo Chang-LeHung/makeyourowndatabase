@@ -160,6 +160,18 @@ public class EvaluatorBaseListener implements EvaluatorListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterSingleString(EvaluatorParser.SingleStringContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitSingleString(EvaluatorParser.SingleStringContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterNInt(EvaluatorParser.NIntContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -203,6 +215,18 @@ public class EvaluatorBaseListener implements EvaluatorListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitParens(EvaluatorParser.ParensContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterDoubleString(EvaluatorParser.DoubleStringContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitDoubleString(EvaluatorParser.DoubleStringContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

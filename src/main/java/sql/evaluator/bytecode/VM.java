@@ -5,10 +5,13 @@ import sql.evaluator.bytecode.data.DataType;
 import sql.evaluator.bytecode.data.Float;
 import sql.evaluator.bytecode.data.Int;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Stack;
 
 public class VM {
+
 
   private Stack<DataType> stack;
   private Map<String, DataType> namespace;
@@ -82,8 +85,9 @@ public class VM {
     stack.push(data);
   }
 
-  public void doCall(String name, int nArgs) {
-
+  public void doCall(String name, int nArgs) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    Method method = FunctionCall.class.getMethod(name, Stack.class, int.class);
+    method.invoke(null, stack, nArgs);
   }
 
   public void doAnd() {

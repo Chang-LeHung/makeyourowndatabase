@@ -8,12 +8,29 @@ import sql.evaluator.bytecode.bytecodes.ByteCodeConst;
 import sql.evaluator.bytecode.bytecodes.ByteCodeLoad;
 import sql.evaluator.bytecode.data.Float;
 import sql.evaluator.bytecode.data.Int;
+import sql.evaluator.bytecode.data.StringData;
 
 import java.util.List;
 
 public class ByteCodeGenerator extends EvaluatorBaseVisitor<Void> {
 
   private List<ByteCode> byteCodes;
+
+  @Override
+  public Void visitSingleString(EvaluatorParser.SingleStringContext ctx) {
+    String text = ctx.ID().getText();
+    StringData data = new StringData((char) 3, text);
+    byteCodes.add(new ByteCodeConst(Operator.LOAD_CONST, data));
+    return null;
+  }
+
+  @Override
+  public Void visitDoubleString(EvaluatorParser.DoubleStringContext ctx) {
+    String text = ctx.ID().getText();
+    StringData data = new StringData((char) 3, text);
+    byteCodes.add(new ByteCodeConst(Operator.LOAD_CONST, data));
+    return null;
+  }
 
   public ByteCodeGenerator(List<ByteCode> byteCodes) {
     this.byteCodes = byteCodes;

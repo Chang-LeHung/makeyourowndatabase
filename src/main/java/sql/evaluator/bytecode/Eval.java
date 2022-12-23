@@ -12,6 +12,7 @@ import sql.evaluator.bytecode.data.DataType;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -44,7 +45,7 @@ public class Eval {
   }
 
   public static DataType eval(List<ByteCode> byteCodes,
-                              Map<String, DataType> namespace) {
+                              Map<String, DataType> namespace) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
     // data stack for virtual machine
     VM vm = new VM(new Stack<>(), namespace);
     for (ByteCode code : byteCodes) {

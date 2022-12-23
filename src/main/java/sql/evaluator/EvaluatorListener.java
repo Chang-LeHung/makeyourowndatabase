@@ -152,6 +152,18 @@ public interface EvaluatorListener extends ParseTreeListener {
 	 */
 	void exitFunction(EvaluatorParser.FunctionContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code SingleString}
+	 * labeled alternative in {@link EvaluatorParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void enterSingleString(EvaluatorParser.SingleStringContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code SingleString}
+	 * labeled alternative in {@link EvaluatorParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void exitSingleString(EvaluatorParser.SingleStringContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code NInt}
 	 * labeled alternative in {@link EvaluatorParser#expression}.
 	 * @param ctx the parse tree
@@ -199,6 +211,18 @@ public interface EvaluatorListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitParens(EvaluatorParser.ParensContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code DoubleString}
+	 * labeled alternative in {@link EvaluatorParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void enterDoubleString(EvaluatorParser.DoubleStringContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code DoubleString}
+	 * labeled alternative in {@link EvaluatorParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void exitDoubleString(EvaluatorParser.DoubleStringContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code NFloat}
 	 * labeled alternative in {@link EvaluatorParser#expression}.
