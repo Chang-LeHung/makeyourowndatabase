@@ -20,6 +20,7 @@ import java.util.Stack;
 
 public class Eval {
 
+  public static VM vm = new VM(new Stack<>(), null);
   public static EvaluatorParser commonStep(InputStream inputStream) throws IOException {
     ANTLRInputStream stream = new ANTLRInputStream(inputStream);
 
@@ -47,7 +48,7 @@ public class Eval {
   public static DataType eval(List<ByteCode> byteCodes,
                               Map<String, DataType> namespace) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
     // data stack for virtual machine
-    VM vm = new VM(new Stack<>(), namespace);
+    vm.setNamespace(namespace);
     for (ByteCode code : byteCodes) {
       switch (code.getOperator()) {
         case MUL:

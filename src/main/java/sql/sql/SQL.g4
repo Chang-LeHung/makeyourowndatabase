@@ -3,17 +3,74 @@
 
 grammar SQL;
 
+options { caseInsensitive = true; }
+
+statement: create                                           # DoCreate
+           | select                                         # DoSelect
+           | insert                                         # DoInsert
+           | update                                         # DoUpdate
+           | delete                                         # DoDelete
+           ;
 
 create: CREATE TABLE ID '('
-        item+
-        keys?
-        ')'
+        item*
+        ((pkeys ',' rkeys) | pkeys)
+        ')' ';'                                             # SQLCreate
         ;
 
-keys: (PRIMARY KEY '(' ID (',' ID)? ')')?      # PrimaryKey
+select: SELECT ('*' | (itemexpre (',' itemexpre)*))
+        FROM ID where? groupby?  having? ';'                # SQLSelect
+        ;
+
+
+insert: INSERT INTO ID '(' ID (',' ID)*')'
+        VALUE '(' (data (',' data)*)')' ';'                 # SQLInsertOne
+        |INSERT INTO ID '('ID (',' ID)*')'
+        VALUES '(' '(' (data (',' data)*)')'
+         (',' '(' (data (',' data)*)')')* ')' ';'           # SQLInsertMany
+        ;
+
+update: UPDATE ID SET assign (',' assign)* where ';'        # SQLUpdate
+        ;
+
+delete: DELETE FROM ID where                                # SQLDelete
+        ;
+
+assign: ID '=' data                                         # UpdateAssign
+        ;
+
+group: '(' (data (',' data)*)')';
+
+data: '\'' ID '\''
+      | '"' ID '"'
+      | MFLOAT
+      | MINT
       ;
 
-item: (ID ',' TYPE (constrain)?)             # SingleItem
+itemexpre: ID                                                # OrdinaryItem
+           | ID '(' ID ')'                                   # FunctionItem
+           ;
+
+where: WHERE conditions                                      # WhereCondition
+       ;
+having: HAVING conditions                                    # HavingCondition
+       ;
+
+groupby: GROUP BY ID                                         # GroupByImpl
+         ;
+
+pkeys: (PRIMARY KEY '(' ID (',' ID)? ')')?                   # PrimaryKey
+      ;
+
+rkeys: (fk rk)?
+      ;
+
+fk: FOREIGN KEY '(' ID (',' ID)? ')'                         # ForeignKey
+    ;
+rk: REFERENCE ID '(' ID (',' ID)? ')'                        # ReferenceKey
+    ;
+
+item: ID TYPE ('('MINT')')? constrain? ','                   # SingleItem
       ;
 
 constrain: PRIMARY KEY
@@ -22,48 +79,84 @@ constrain: PRIMARY KEY
            ;
 
 
-CREATE: C R E A T E;
-SELECT: S E L E C T;
-DELETE: D E L E T E;
-INSERT: I N S E R T;
-TABLE: T A B L E;
-NOT: N O T;
-NULL: N U L L;
-UNIQUE: U N I Q U E;
 
-ID: [A-Za-z]+;
-TYPE: FLOAT | INT | CHAR | VARCHAR;
+conditions: '(' conditions ')'
+    | conditions AND conditions
+    | conditions OR conditions
+    | '!' conditions
+    | condition
+    ;
 
-PRIMARY: P R I M A R Y;
-KEY: K E Y;
-FLOAT: F L O A T;
-INT: I N T;
-CHAR: C H A R;
-VARCHAR: V A R C H A R;
+condition: expression '>' expression
+    | expression '<' expression
+    | expression '>=' expression
+    | expression '<=' expression
+    | expression '==' expression
+    | expression '!=' expression
+    ;
 
-fragment A:[aA];
-fragment B:[bB];
-fragment C:[cC];
-fragment D:[dD];
-fragment E:[eE];
-fragment F:[fF];
-fragment G:[gG];
-fragment H:[hH];
-fragment I:[iI];
-fragment J:[jJ];
-fragment K:[kK];
-fragment L:[lL];
-fragment M:[mM];
-fragment N:[nN];
-fragment O:[oO];
-fragment P:[pP];
-fragment Q:[qQ];
-fragment R:[rR];
-fragment S:[sS];
-fragment T:[tT];
-fragment U:[uU];
-fragment V:[vV];
-fragment W:[wW];
-fragment X:[xX];
-fragment Y:[yY];
-fragment Z:[zZ];
+expression: expression op=('*'|'/') expression
+    | expression op=('+'|'-') expression
+    | MINT
+    | '-' MINT
+    | ID
+    | '\'' ID '\''
+    | '"' ID '"'
+    | ID '(' expression (',' expression)* ')'
+    | '(' expression ')'
+    | MFLOAT
+    ;
+
+MUL: '*';
+DIV: '/';
+ADD: '+';
+SUB: '-';
+AND: 'and';
+OR: 'or';
+
+MINT: [1-9][0-9]*;
+MFLOAT: '.'[0-9]+
+    | '0.'[0-9]+
+    | MINT '.' [0-9]+
+    ;
+
+CREATE: 'create';
+SELECT: 'select';
+DELETE: 'delete';
+INSERT: 'insert';
+UPDATE: 'update';
+TABLE: 'table';
+WHERE: 'where';
+GROUP: 'group';
+HAVING: 'having';
+BY: 'by';
+SET: 'set';
+INTO: 'into';
+FROM: 'from';
+NOT: 'not';
+VALUES: 'values';
+VALUE: 'value';
+NULL: 'null';
+UNIQUE: 'unique';
+FOREIGN: 'foreign';
+REFERENCE: 'references';
+
+TYPE: FLOAT
+     | INT
+     | CHAR
+     | VARCHAR
+     | STRING
+     ;
+
+
+PRIMARY: 'primary';
+KEY: 'key';
+FLOAT: 'float';
+INT: 'int';
+CHAR: 'char';
+VARCHAR: 'varchar';
+STRING: 'string';
+
+ID: [_a-z0-9]+;
+
+WS: [ \t\n] -> skip;
