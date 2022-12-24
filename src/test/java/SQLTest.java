@@ -95,4 +95,20 @@ public class SQLTest {
     objectGenerator.visit(statement);
     System.out.println(objectGenerator.getDelete());
   }
+
+  @Test
+  public void insertOne() throws IOException {
+    String code = "insert into student(sno,name,age) values(9,'zyang',18);";
+    ByteArrayInputStream inputStream = new ByteArrayInputStream(code.getBytes(StandardCharsets.UTF_8));
+    ANTLRInputStream stream = new ANTLRInputStream(inputStream);
+    SQLLexer lexer = new SQLLexer(stream);
+    CommonTokenStream tokenStream = new CommonTokenStream(lexer);
+    SQLParser parser = new SQLParser(tokenStream);
+    SQLParser.StatementContext statement = parser.statement();
+
+    SQLObjectGenerator objectGenerator = new SQLObjectGenerator();
+    objectGenerator.visit(statement);
+    System.out.println(objectGenerator.getInsert());
+  }
+
 }

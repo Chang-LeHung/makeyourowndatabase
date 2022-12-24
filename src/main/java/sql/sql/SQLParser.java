@@ -554,7 +554,7 @@ public class SQLParser extends Parser {
 		public TerminalNode ID(int i) {
 			return getToken(SQLParser.ID, i);
 		}
-		public TerminalNode VALUE() { return getToken(SQLParser.VALUE, 0); }
+		public TerminalNode VALUES() { return getToken(SQLParser.VALUES, 0); }
 		public GroupContext group() {
 			return getRuleContext(GroupContext.class,0);
 		}
@@ -644,7 +644,7 @@ public class SQLParser extends Parser {
 				setState(108);
 				match(T__2);
 				setState(109);
-				match(VALUE);
+				match(VALUES);
 				setState(110);
 				group();
 				setState(111);
@@ -968,7 +968,6 @@ public class SQLParser extends Parser {
 			{
 			setState(164);
 			match(T__0);
-			{
 			setState(165);
 			data();
 			setState(170);
@@ -986,7 +985,6 @@ public class SQLParser extends Parser {
 				setState(172);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
-			}
 			}
 			setState(173);
 			match(T__2);
@@ -2374,7 +2372,7 @@ public class SQLParser extends Parser {
 		"\u0000fh\u00053\u0000\u0000ge\u0001\u0000\u0000\u0000hk\u0001\u0000\u0000"+
 		"\u0000ig\u0001\u0000\u0000\u0000ij\u0001\u0000\u0000\u0000jl\u0001\u0000"+
 		"\u0000\u0000ki\u0001\u0000\u0000\u0000lm\u0005\u0003\u0000\u0000mn\u0005"+
-		"&\u0000\u0000no\u0003\u000e\u0007\u0000op\u0005\u0004\u0000\u0000p\u008c"+
+		"%\u0000\u0000no\u0003\u000e\u0007\u0000op\u0005\u0004\u0000\u0000p\u008c"+
 		"\u0001\u0000\u0000\u0000qr\u0005\u001a\u0000\u0000rs\u0005\"\u0000\u0000"+
 		"st\u00053\u0000\u0000tu\u0005\u0001\u0000\u0000uz\u00053\u0000\u0000v"+
 		"w\u0005\u0002\u0000\u0000wy\u00053\u0000\u0000xv\u0001\u0000\u0000\u0000"+

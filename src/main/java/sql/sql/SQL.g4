@@ -24,10 +24,9 @@ select: SELECT ('*' | (itemexpre (',' itemexpre)*))
 
 
 insert: INSERT INTO ID '(' ID (',' ID)*')'
-        VALUE '(' (data (',' data)*)')' ';'                 # SQLInsertOne
+        VALUES group ';'                 # SQLInsertOne
         |INSERT INTO ID '('ID (',' ID)*')'
-        VALUES '(' '(' (data (',' data)*)')'
-         (',' '(' (data (',' data)*)')')* ')' ';'           # SQLInsertMany
+        VALUES '(' group (',' group)* ')' ';'           # SQLInsertMany
         ;
 
 update: UPDATE ID SET assign (',' assign)* where ';'        # SQLUpdate
@@ -39,7 +38,7 @@ delete: DELETE FROM ID where                                # SQLDelete
 assign: ID '=' data                                         # UpdateAssign
         ;
 
-group: '(' (data (',' data)*)')';
+group: '(' data (',' data)* ')';
 
 data: '\'' ID '\''
       | '"' ID '"'
