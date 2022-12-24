@@ -53,7 +53,7 @@ public class SQLTest {
 
   @Test
   public void insertTest() throws IOException {
-    String code = "insert into student(sno,name,age) values((9,'zyang',18), (9,'zyang',17), (9,'zyang',16));";
+    String code = "insert into student(sno,name,age) values((9,zyang,18), (9,'zyang',17), (9,'zyang',16));";
     ByteArrayInputStream inputStream = new ByteArrayInputStream(code.getBytes(StandardCharsets.UTF_8));
     ANTLRInputStream stream = new ANTLRInputStream(inputStream);
     SQLLexer lexer = new SQLLexer(stream);

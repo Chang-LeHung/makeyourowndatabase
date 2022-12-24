@@ -42,6 +42,7 @@ group: '(' data (',' data)* ')';
 
 data: '\'' ID '\''
       | '"' ID '"'
+      | ID
       | MFLOAT
       | MINT
       ;
