@@ -3,6 +3,7 @@ import org.junit.Test;
 import sql.evaluator.bytecode.Eval;
 import sql.evaluator.bytecode.bytecodes.ByteCode;
 import sql.evaluator.bytecode.data.DataType;
+import sql.evaluator.bytecode.data.Float;
 import sql.evaluator.bytecode.data.Int;
 
 import java.io.ByteArrayInputStream;
@@ -10,7 +11,6 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 
 public class EvalTest {
@@ -79,4 +79,22 @@ public class EvalTest {
       System.out.println(byteCode);
     }
   }
+
+  @Test
+  public void aggDoTest() throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+    String code = "min(a) + max(b)";
+    HashMap<String, DataType> map = new HashMap<>();
+    map.put("__agg__min__a", new Int((char) 0, 2));
+    Float aFloat = new Float((char) 0);
+    aFloat.setVal(21312.3123f);
+    map.put("__agg__max__b", aFloat);
+    ByteArrayInputStream inputStream = new ByteArrayInputStream(code.getBytes(StandardCharsets.UTF_8));
+    List<ByteCode> byteCodes = Eval.expressionCodeGen(inputStream);
+    for (ByteCode byteCode : byteCodes) {
+      System.out.println(byteCode);
+    }
+    DataType eval = Eval.eval(byteCodes, map);
+    System.out.println(eval);
+  }
+
 }
