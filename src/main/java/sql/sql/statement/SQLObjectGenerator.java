@@ -45,6 +45,7 @@ public class SQLObjectGenerator extends SQLBaseVisitor<Void> {
     select = new SQLSelect();
     select.setFields(new ArrayList<>());
     select.setFields(new ArrayList<>());
+    select.setItems(new ArrayList<>());
     return super.visitDoSelect(ctx);
   }
 
@@ -82,6 +83,10 @@ public class SQLObjectGenerator extends SQLBaseVisitor<Void> {
   public Void visitSQLSelect(SQLParser.SQLSelectContext ctx) {
     super.visitSQLSelect(ctx);
     select.setTableName(ctx.ID().getText());
+    List<SQLParser.ExpressionContext> contexts = ctx.expression();
+    for (SQLParser.ExpressionContext context : contexts) {
+      select.getItems().add(context.getText());
+    }
     return null;
   }
 

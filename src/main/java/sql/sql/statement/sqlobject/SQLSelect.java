@@ -10,6 +10,15 @@ public class SQLSelect extends SQLBase{
   private String where;
   private String groupByField;
   private String having;
+  private List<String> items;
+
+  public List<String> getItems() {
+    return items;
+  }
+
+  public void setItems(List<String> items) {
+    this.items = items;
+  }
 
   public List<Filed> getFields() {
     return fields;
@@ -19,10 +28,10 @@ public class SQLSelect extends SQLBase{
   public String toString() {
     return "SQLSelect{" +
             "tableName='" + tableName + '\'' +
-            ", fields=" + fields +
             ", where='" + where + '\'' +
             ", groupByField='" + groupByField + '\'' +
             ", having='" + having + '\'' +
+            ", items=" + items +
             '}';
   }
 

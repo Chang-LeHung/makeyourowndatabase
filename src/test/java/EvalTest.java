@@ -69,4 +69,14 @@ public class EvalTest {
     DataType eval = Eval.eval(byteCodes, map);
     System.out.println(eval);
   }
+
+  @Test
+  public void aggTest() throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+    String code = "avg(a) + min(b) > max(age)";
+    ByteArrayInputStream inputStream = new ByteArrayInputStream(code.getBytes(StandardCharsets.UTF_8));
+    List<ByteCode> byteCodes = Eval.conditionsCodeGen(inputStream);
+    for (ByteCode byteCode : byteCodes) {
+      System.out.println(byteCode);
+    }
+  }
 }

@@ -18,7 +18,7 @@ create: CREATE TABLE ID '('
         ')' ';'                                             # SQLCreate
         ;
 
-select: SELECT ('*' | (itemexpre (',' itemexpre)*))
+select: SELECT ('*' | (expression (',' expression)*))
         FROM ID where? groupby?  having? ';'                # SQLSelect
         ;
 
@@ -102,7 +102,7 @@ expression: expression op=('*'|'/') expression
     | ID
     | '\'' ID '\''
     | '"' ID '"'
-    | ID '(' expression (',' expression)* ')'
+    | ID '(' ID ')'
     | '(' expression ')'
     | MFLOAT
     ;

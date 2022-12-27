@@ -24,7 +24,8 @@ expression: expression op=('*'|'/') expression                  # MulDiv
     | ID                                                        # ID
     | '\'' ID '\''                                              # SingleString
     | '"' ID '"'                                                # DoubleString
-    | ID '(' expression (',' expression)* ')'                   # Function
+//    | ID '(' expression (',' expression)* ')'                   # Function
+    | ID '(' ID ')'                                             # Function
     | '(' expression ')'                                        # Parens
     | FLOAT                                                     # PFloat
     | '-' FLOAT                                                 # NFloat

@@ -1,5 +1,6 @@
 package sql.evaluator.bytecode;
 
+import org.antlr.v4.runtime.ParserRuleContext;
 import sql.evaluator.EvaluatorBaseVisitor;
 import sql.evaluator.EvaluatorParser;
 import sql.evaluator.bytecode.bytecodes.ByteCode;
@@ -14,7 +15,7 @@ import java.util.List;
 
 public class ByteCodeGenerator extends EvaluatorBaseVisitor<Void> {
 
-  private List<ByteCode> byteCodes;
+  protected List<ByteCode> byteCodes;
 
   @Override
   public Void visitSingleString(EvaluatorParser.SingleStringContext ctx) {
@@ -144,13 +145,21 @@ public class ByteCodeGenerator extends EvaluatorBaseVisitor<Void> {
 
   @Override
   public Void visitFunction(EvaluatorParser.FunctionContext ctx) {
+    super.visitFunction(ctx);
     ByteCodeCall call = new ByteCodeCall(Operator.CALL);
-    List<EvaluatorParser.ExpressionContext> contexts = ctx.expression();
-    for (EvaluatorParser.ExpressionContext context : contexts) {
-      visit(context);
-    }
-    call.setFunctionName(ctx.ID().getText());
-    call.setNumParams(contexts.size());
+    String text = ctx.ID(0).getText();
+    call.setFunctionName(text);
+    call.setNumParams(1);
+    ByteCodeLoad load = new ByteCodeLoad(Operator.LOAD_VAR);
+    if (text.equalsIgnoreCase("min"))
+      load.setVariableName("__agg__min__" + ctx.ID(1).getText());
+    else if (text.equalsIgnoreCase("avg"))
+      load.setVariableName("__agg__avg__" + ctx.ID(1).getText());
+    else if (text.equalsIgnoreCase("max"))
+      load.setVariableName("__agg__max__" + ctx.ID(1).getText());
+    else
+      load.setVariableName(ctx.ID(1).getText());
+    byteCodes.add(load);
     byteCodes.add(call);
     return null;
   }
