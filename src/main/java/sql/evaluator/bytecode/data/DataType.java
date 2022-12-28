@@ -19,7 +19,7 @@ public class DataType {
   public DataType(char dataType) {
     this.dataType = dataType;
   }
-
+z
   public void setDataType(char dataType) {
     this.dataType = dataType;
   }

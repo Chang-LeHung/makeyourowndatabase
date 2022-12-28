@@ -79,6 +79,8 @@ public class SQLTest {
     SQLObjectGenerator objectGenerator = new SQLObjectGenerator();
     objectGenerator.visit(statement);
     System.out.println(objectGenerator.getUpdate());
+
+    System.out.println(parser.isMatchedEOF());
   }
 
   @Test

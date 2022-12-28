@@ -3,7 +3,8 @@ package db.engines.simple;
 import db.actions.DBOperations;
 import sql.evaluator.bytecode.Eval;
 import sql.evaluator.bytecode.bytecodes.ByteCode;
-import sql.evaluator.bytecode.data.DataType;
+import sql.evaluator.bytecode.data.*;
+import sql.evaluator.bytecode.data.Float;
 import sql.sql.statement.sqlobject.*;
 
 import java.io.ByteArrayInputStream;
@@ -104,21 +105,109 @@ public class SingleDataBase implements DBOperations {
   public boolean doUpdate(SQLUpdate update) {
     if (!ensureExist(update.getTableName()))
       return false;
+    Table table = tableMaps.get(update.getTableName());
+    for (List<DataType> data : table.getTableData()) {
+      String condition = update.getCondition();
+      Map<String, DataType> map = list2Map(update.getTableName(), data);
+      Bool eval = (Bool)eval(condition, map);
+      if (eval.isVal()) {
+        Map<String, Object> map1 = update.getMap();
+        HashMap<String, DataType> map2 = new HashMap<>();
+        map1.forEach((x, y) -> {
+          DataType dataType = obj2DataType(y);
+          map2.put(x, dataType);
+        });
+        List<DataType> types = map2List(update.getTableName(), map2);
+        for (int i = 0; i < types.size(); ++i) {
+          data.set(i, types.get(i));
+        }
+      }
+    }
     return true;
+  }
+
+  private List<DataType> map2List(String tableName,
+                                  Map<String, DataType> map) {
+    Table table = tableMaps.get(tableName);
+    List<Item> items = table.getDefinition().getItems();
+    ArrayList<DataType> dataTypes = new ArrayList<>();
+    for (Item item : items) {
+      dataTypes.add(map.getOrDefault(item.getName(), null));
+    }
+    return dataTypes;
   }
 
   @Override
   public boolean doDelete(SQLDelete delete) {
     if (!ensureExist(delete.getTableName()))
       return false;
+    Table table = tableMaps.get(delete.getTableName());
+    for (List<DataType> data : table.getTableData()) {
+      String condition = delete.getCondition();
+      Map<String, DataType> map = list2Map(delete.getTableName(), data);
+      Bool eval = (Bool)eval(condition, map);
+      if (eval.isVal())
+        table.getTableData().remove(data);
+    }
     return true;
+  }
+
+  private Map<String, DataType> list2Map(String tableName, List<DataType> data) {
+    Table table = tableMaps.get(tableName);
+    TableDefinition definition = table.getDefinition();
+    List<Item> items = definition.getItems();
+    HashMap<String, DataType> map = new HashMap<>();
+    for (int i = 0; i < items.size(); ++i) {
+      map.put(items.get(i).getName(), data.get(i));
+    }
+    return map;
   }
 
   @Override
   public boolean doInsert(SQLInsert insert) {
     if (!ensureExist(insert.getTableName()))
       return false;
+    Table table = tableMaps.get(insert.getTableName());
+    List<Item> items = table.getDefinition().getItems();
+    List<List<DataType>> objects = new ArrayList<>();
+    List<String> pk = table.getDefinition().getPk();
+    for (Map<String, Object> assign : insert.getAssigns()) {
+      ArrayList<DataType> list = new ArrayList<>();
+      objects.add(list);
+      for (int i = 0; i < items.size(); ++i) {
+        Item item = items.get(i);
+        Object o = assign.getOrDefault(item.getName(), null);
+        if (o == null && item.isNotNull()) {
+          errMsg = item.getName() + " should not be null";
+          return false;
+        }
+        if (item.isUnique() || item.isPrimaryKey() || pk.contains(item.getName())) {
+          for (List<DataType> data : table.getTableData()) {
+            if (data.get(i).equals(o)) {
+              errMsg = item.getName() + " has already existed";
+              return false;
+            }
+          }
+        }
+        list.add(obj2DataType(o));
+      }
+    }
+    table.getTableData().addAll(objects);
     return true;
+  }
+
+  private DataType obj2DataType(Object o) {
+    if (o instanceof Integer) {
+      Int dataType = new Int((char) 1);
+      dataType.setVal((Integer)o);
+      return dataType;
+    }else if (o instanceof Float || o instanceof Double) {
+      Float data = new Float((char)1, (java.lang.Float) o);
+      return data;
+    }
+    StringData data = new StringData((char) 2);
+    data.setParam((String) o);
+    return data;
   }
 
   private boolean ensureExist(String table) {
@@ -142,7 +231,7 @@ public class SingleDataBase implements DBOperations {
   }
 
   private void doLoadTable(String table) throws IOException, ClassNotFoundException {
-    List<List<Object>> data = Table.load(table + ".da");
+    List<List<DataType>> data = Table.load(table + ".da");
     TableDefinition definition = TableDefinition.load(table + ".def");
     Table tableData = new Table(definition, data);
     tableMaps.put(table, tableData);

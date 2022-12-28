@@ -4,6 +4,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 
 public class FileTest {
 
@@ -30,6 +31,18 @@ public class FileTest {
     FileDescriptor fd = demo.getFD();
     fd.sync();
     demo.close();
+  }
+
+  @Test
+  public void testArr() {
+    ArrayList<Integer> integers = new ArrayList<>();
+    for (int i = 0; i < 10; ++i)
+      integers.add(i);
+    for (Integer integer : integers) {
+      if (integer == 5)
+        integers.remove(integer);
+    }
+    System.out.println(integers);
   }
 
 }
