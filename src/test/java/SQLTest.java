@@ -15,9 +15,9 @@ public class SQLTest {
   @Test
   public void createTest() throws IOException {
     String code = "create TAble sc (\n" +
-            "        sno int,\n" +
-            "        cno int,\n" +
-            "        grade int,\n" +
+            "        sno int primary key,\n" +
+            "        cno int not null,\n" +
+            "        grade int unique,\n" +
             "        primary key(sno,cno),\n" +
             "        foreign key (sno) references student(sno)\n" +
             "   );";

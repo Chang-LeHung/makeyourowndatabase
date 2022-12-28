@@ -4,6 +4,7 @@ public class Item {
 
   private String name;
   private String type;
+  private String constrain;
 
   /* 如果是 char varchar string 表示最多几个字符 -1 表示不是以上类型*/
   private int size;
@@ -12,7 +13,8 @@ public class Item {
   public String toString() {
     return "Item{" +
             "name='" + name + '\'' +
-            ", type=" + type +
+            ", type='" + type + '\'' +
+            ", constrain='" + constrain + '\'' +
             ", size=" + size +
             '}';
   }
@@ -39,5 +41,25 @@ public class Item {
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  public String getConstrain() {
+    return constrain;
+  }
+
+  public void setConstrain(String constrain) {
+    this.constrain = constrain;
+  }
+
+  public boolean isPrimaryKey() {
+    return "primarykey".equalsIgnoreCase(constrain);
+  }
+
+  public boolean isUnique() {
+    return "unique".equalsIgnoreCase(constrain);
+  }
+
+  public boolean isNotNull() {
+    return "notnull".equalsIgnoreCase(constrain);
   }
 }

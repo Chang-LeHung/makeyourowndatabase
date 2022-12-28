@@ -33,7 +33,8 @@ public class Table {
     ObjectOutputStream stream = new ObjectOutputStream(outputStream);
 
     stream.writeObject(tableData);
-
+    FileDescriptor fd = outputStream.getFD();
+    fd.sync();
     stream.close();
     outputStream.close();
   }

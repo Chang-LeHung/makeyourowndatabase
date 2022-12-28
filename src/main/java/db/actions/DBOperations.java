@@ -8,11 +8,11 @@ public interface DBOperations {
 
   HashMap<String, Object> doSelect(SQLSelect select);
 
-  void doCreate(SQLCreate create);
+  boolean doCreate(SQLCreate create);
 
-  void doUpdate(SQLUpdate update);
+  boolean doUpdate(SQLUpdate update);
 
-  void doDelete(SQLDelete delete);
+  boolean doDelete(SQLDelete delete);
 
-  void doInsert(SQLInsert insert);
+  boolean doInsert(SQLInsert insert);
 }

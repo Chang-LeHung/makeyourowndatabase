@@ -264,6 +264,8 @@ public class SQLObjectGenerator extends SQLBaseVisitor<Void> {
       item.setSize(Integer.parseInt(mint.getText()));
     else
       item.setSize(-1);
+    SQLParser.ConstrainContext constrain = ctx.constrain();
+    if (constrain != null) item.setConstrain(constrain.getText());
     create.getItems().add(item);
     return null;
   }

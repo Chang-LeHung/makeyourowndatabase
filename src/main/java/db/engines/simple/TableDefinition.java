@@ -1,5 +1,7 @@
 package db.engines.simple;
 
+import sql.sql.statement.sqlobject.Item;
+
 import java.io.*;
 import java.util.List;
 
@@ -68,7 +70,9 @@ public class TableDefinition implements Serializable {
     ObjectOutputStream stream = new ObjectOutputStream(outputStream);
 
     stream.writeObject(this);
-
+    FileDescriptor fd = outputStream.getFD();
+    // sync to disk
+    fd.sync();
     stream.close();
     outputStream.close();
   }
