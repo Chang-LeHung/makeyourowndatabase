@@ -31,13 +31,15 @@ public class SingleDataBase implements DBOperations {
 
   String errMsg;
 
-  private List<String> tables;
+  private Set<String> tables;
 
   private Map<String, Table> tableMaps;
 
   public SingleDataBase(String dir) {
+    tableMaps = new HashMap<>();
+    files = new HashSet<>();
     this.dir = dir;
-    tables = new CopyOnWriteArrayList<>();
+    tables = new HashSet<>();
     File file = new File(dir);
     for (File f : Objects.requireNonNull(file.listFiles())) {
       if (f.isFile() && f.getName().endsWith(".def")) {
@@ -56,19 +58,66 @@ public class SingleDataBase implements DBOperations {
     this.dir = dir;
   }
 
-  public List<String> getTables() {
+  public Set<String> getTables() {
     return tables;
   }
 
-  public void setTables(List<String> tables) {
-    this.tables = tables;
-  }
-
   @Override
-  public HashMap<String, Object> doSelect(SQLSelect select) {
+  public List<Map<String, DataType>> doSelect(SQLSelect select) {
     if (!ensureExist(select.getTableName()))
       return null;
-    return null;
+    if (!ensureLoadTable(select.getTableName()))
+      return null;
+    ArrayList<Map<String, DataType>> results = new ArrayList<>();
+    Table table = tableMaps.get(select.getTableName());
+    List<List<DataType>> tableData = table.getTableData();
+    String where = select.getWhere();
+    List<Item> items = table.getDefinition().getItems();
+    List<String> query = select.getItems();
+    if (query.size() == 0) {
+      for (Item item : table.getDefinition().getItems()) {
+        query.add(item.getName());
+      }
+    }
+    if (where == null) {
+      for (List<DataType> tableDatum : tableData) {
+        Map<String, DataType> map = list2Map(tableDatum, items);
+        if (!extractDataFromSingleRow(results, query, map)) return null;
+      }
+    }else {
+      for (List<DataType> tableDatum : tableData) {
+        Map<String, DataType> map = list2Map(tableDatum, items);
+        DataType eval = eval(where, map);
+        Bool ret = (Bool)eval;
+        if (ret.isVal()) {
+          if (!extractDataFromSingleRow(results, query, map)) return null;
+        }
+      }
+    }
+    return results;
+  }
+
+  private boolean extractDataFromSingleRow(ArrayList<Map<String, DataType>> results, List<String> query, Map<String, DataType> map) {
+    Map<String, DataType> r = new HashMap<>();
+    for (String s : query) {
+      if (!map.containsKey(s)) {
+        errMsg = "table can not contain item " + s;
+        return false;
+      }
+      r.put(s, map.get(s));
+    }
+    results.add(r);
+    return true;
+  }
+
+  private Map<String, DataType> list2Map(List<DataType> row,
+                                         List<Item> items) {
+    HashMap<String, DataType> map = new HashMap<>();
+
+    for (int i = 0; i < row.size(); ++i) {
+      map.put(items.get(i).getName(), row.get(i));
+    }
+    return map;
   }
 
   @Override
@@ -94,16 +143,27 @@ public class SingleDataBase implements DBOperations {
     try {
       definition.dump(path.toString());
     } catch (IOException e) {
+      e.printStackTrace();
       errMsg = e.getMessage();
       return false;
     }
     tableMaps.put(definition.getTableName(), table);
+    tables.add(definition.getTableName());
+    try {
+      path = Paths.get(dir, definition.getTableName() + ".da");
+      table.dump(path.toString());
+    } catch (IOException e) {
+      errMsg = "I/O error";
+      return false;
+    }
     return true;
   }
 
   @Override
   public boolean doUpdate(SQLUpdate update) {
     if (!ensureExist(update.getTableName()))
+      return false;
+    if (!ensureLoadTable(update.getTableName()))
       return false;
     Table table = tableMaps.get(update.getTableName());
     for (List<DataType> data : table.getTableData()) {
@@ -112,16 +172,22 @@ public class SingleDataBase implements DBOperations {
       Bool eval = (Bool)eval(condition, map);
       if (eval.isVal()) {
         Map<String, Object> map1 = update.getMap();
-        HashMap<String, DataType> map2 = new HashMap<>();
         map1.forEach((x, y) -> {
           DataType dataType = obj2DataType(y);
-          map2.put(x, dataType);
+          map.put(x, dataType);
         });
-        List<DataType> types = map2List(update.getTableName(), map2);
+        List<DataType> types = map2List(update.getTableName(), map);
         for (int i = 0; i < types.size(); ++i) {
           data.set(i, types.get(i));
         }
       }
+    }
+    try {
+      Path path = Paths.get(dir, table.getDefinition().getTableName() + ".da");
+      table.dump(path.toString());
+    } catch (IOException e) {
+      errMsg = "I/O error";
+      return false;
     }
     return true;
   }
@@ -141,6 +207,8 @@ public class SingleDataBase implements DBOperations {
   public boolean doDelete(SQLDelete delete) {
     if (!ensureExist(delete.getTableName()))
       return false;
+    if (!ensureLoadTable(delete.getTableName()))
+      return false;
     Table table = tableMaps.get(delete.getTableName());
     for (List<DataType> data : table.getTableData()) {
       String condition = delete.getCondition();
@@ -148,6 +216,14 @@ public class SingleDataBase implements DBOperations {
       Bool eval = (Bool)eval(condition, map);
       if (eval.isVal())
         table.getTableData().remove(data);
+    }
+
+    try {
+      Path path = Paths.get(dir, table.getDefinition().getTableName() + ".da");
+      table.dump(path.toString());
+    } catch (IOException e) {
+      errMsg = "I/O error";
+      return false;
     }
     return true;
   }
@@ -167,33 +243,74 @@ public class SingleDataBase implements DBOperations {
   public boolean doInsert(SQLInsert insert) {
     if (!ensureExist(insert.getTableName()))
       return false;
+    if (!ensureLoadTable(insert.getTableName()))
+      return false;
     Table table = tableMaps.get(insert.getTableName());
     List<Item> items = table.getDefinition().getItems();
     List<List<DataType>> objects = new ArrayList<>();
     List<String> pk = table.getDefinition().getPk();
     for (Map<String, Object> assign : insert.getAssigns()) {
       ArrayList<DataType> list = new ArrayList<>();
-      objects.add(list);
       for (int i = 0; i < items.size(); ++i) {
         Item item = items.get(i);
         Object o = assign.getOrDefault(item.getName(), null);
+        DataType dataType = obj2DataType(item, (String) o);
+        if (dataType == null) return false;
         if (o == null && item.isNotNull()) {
           errMsg = item.getName() + " should not be null";
           return false;
         }
         if (item.isUnique() || item.isPrimaryKey() || pk.contains(item.getName())) {
           for (List<DataType> data : table.getTableData()) {
-            if (data.get(i).equals(o)) {
-              errMsg = item.getName() + " has already existed";
+            if (data.get(i).equals(dataType)) {
+              errMsg = item.getName() + " = " + dataType + " has already existed";
               return false;
             }
           }
         }
-        list.add(obj2DataType(o));
+        list.add(dataType);
       }
+      objects.add(list);
     }
     table.getTableData().addAll(objects);
+    try {
+      Path path = Paths.get(dir, table.getDefinition().getTableName() + ".da");
+      table.dump(path.toString());
+    } catch (IOException e) {
+      e.printStackTrace();
+      errMsg = "I/O error";
+      return false;
+    }
     return true;
+  }
+
+  private DataType obj2DataType(Item item, String o) {
+    String type = item.getType();
+    if ("int".equalsIgnoreCase(type)) {
+      int i;
+      try {
+        i = Integer.parseInt(o);
+      }catch (NumberFormatException e) {
+        errMsg = o + " is not type of int";
+        return null;
+      }
+      return new Int((char)0, i);
+    }else if ("string".equalsIgnoreCase(type) ||
+    "varchar".equalsIgnoreCase(type) || "char".equalsIgnoreCase(type)) {
+      return new StringData((char)2, o);
+    }else if ("float".equalsIgnoreCase(type) ||
+    "double".equalsIgnoreCase(type)) {
+      float i;
+      try {
+        i = java.lang.Float.parseFloat(o);
+      }catch (NumberFormatException e) {
+        errMsg = o + " is not type of int";
+        return null;
+      }
+      return new Float((char)0, i);
+    }
+    errMsg = "meet a unsupported type";
+    return null;
   }
 
   private DataType obj2DataType(Object o) {
@@ -212,7 +329,7 @@ public class SingleDataBase implements DBOperations {
 
   private boolean ensureExist(String table) {
     if (!isExisted(table)) {
-      errMsg = "table not exists";
+      errMsg = "table " + table + " not exists;";
       return false;
     }
     return true;
@@ -231,14 +348,16 @@ public class SingleDataBase implements DBOperations {
   }
 
   private void doLoadTable(String table) throws IOException, ClassNotFoundException {
-    List<List<DataType>> data = Table.load(table + ".da");
-    TableDefinition definition = TableDefinition.load(table + ".def");
+    Path path = Paths.get(dir, table + ".da");
+    List<List<DataType>> data = Table.load(path.toString());
+    path = Paths.get(dir, table + ".def");
+    TableDefinition definition = TableDefinition.load(path.toString());
     Table tableData = new Table(definition, data);
     tableMaps.put(table, tableData);
   }
 
   private boolean isExisted(String fileName) {
-    return files.contains(fileName + ".da");
+    return files.contains(fileName + ".def") || tables.contains(fileName);
   }
 
   public String getErrMsg() {

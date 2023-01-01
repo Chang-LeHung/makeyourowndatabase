@@ -1,7 +1,10 @@
 package sql.sql.statement.sqlobject;
 
-public class Item {
+import java.io.Serializable;
 
+public class Item implements Serializable {
+
+  public static final long serialVersionUID = 2222222222L;
   private String name;
   private String type;
   private String constrain;

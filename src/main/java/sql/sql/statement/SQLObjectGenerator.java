@@ -28,6 +28,26 @@ public class SQLObjectGenerator extends SQLBaseVisitor<Void> {
    */
   private int curStatementType;
 
+  public boolean isCreate() {
+    return curStatementType == 0;
+  }
+
+  public boolean isSelect() {
+    return curStatementType == 1;
+  }
+
+  public boolean isInsert() {
+    return curStatementType == 2;
+  }
+
+  public boolean isUpdate() {
+    return curStatementType == 3;
+  }
+
+  public boolean isDelete() {
+    return curStatementType == 4;
+  }
+
   @Override
   public Void visitDoCreate(SQLParser.DoCreateContext ctx) {
     curStatementType = 0;

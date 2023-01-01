@@ -1,5 +1,7 @@
 package sql.evaluator.bytecode.data;
 
+import java.util.Objects;
+
 public class Bool extends DataType{
 
   private boolean val;
@@ -20,6 +22,20 @@ public class Bool extends DataType{
     return "Bool{" +
             "val=" + val +
             '}';
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    if (!super.equals(o)) return false;
+    Bool bool = (Bool) o;
+    return val == bool.val;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), val);
   }
 
   public Bool(char dataType, boolean val) {

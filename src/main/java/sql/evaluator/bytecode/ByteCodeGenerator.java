@@ -20,7 +20,7 @@ public class ByteCodeGenerator extends EvaluatorBaseVisitor<Void> {
   @Override
   public Void visitSingleString(EvaluatorParser.SingleStringContext ctx) {
     String text = ctx.ID().getText();
-    StringData data = new StringData((char) 3, text);
+    StringData data = new StringData((char) 2, text);
     byteCodes.add(new ByteCodeConst(Operator.LOAD_CONST, data));
     return null;
   }
@@ -28,7 +28,7 @@ public class ByteCodeGenerator extends EvaluatorBaseVisitor<Void> {
   @Override
   public Void visitDoubleString(EvaluatorParser.DoubleStringContext ctx) {
     String text = ctx.ID().getText();
-    StringData data = new StringData((char) 3, text);
+    StringData data = new StringData((char) 2, text);
     byteCodes.add(new ByteCodeConst(Operator.LOAD_CONST, data));
     return null;
   }

@@ -3,6 +3,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.junit.Test;
 import sql.sql.SQLLexer;
 import sql.sql.SQLParser;
+import sql.sql.statement.ErrorListener;
 import sql.sql.statement.SQLObjectGenerator;
 
 import java.io.ByteArrayInputStream;
@@ -50,6 +51,24 @@ public class SQLTest {
     objectGenerator.visit(statement);
     System.out.println(objectGenerator.getSelect());
   }
+
+  @Test
+  public void selectTest01() throws IOException {
+    String code = "select * from student;";
+    ByteArrayInputStream inputStream = new ByteArrayInputStream(code.getBytes(StandardCharsets.UTF_8));
+    ANTLRInputStream stream = new ANTLRInputStream(inputStream);
+    SQLLexer lexer = new SQLLexer(stream);
+    CommonTokenStream tokenStream = new CommonTokenStream(lexer);
+    SQLParser parser = new SQLParser(tokenStream);
+    ErrorListener errorListener = new ErrorListener();
+    parser.addErrorListener(errorListener);
+    SQLParser.StatementContext statement = parser.statement();
+    SQLObjectGenerator objectGenerator = new SQLObjectGenerator();
+    objectGenerator.visit(statement);
+    System.out.println(objectGenerator.getSelect());
+    System.out.println(errorListener.isErrorOccurred());
+  }
+
 
   @Test
   public void insertTest() throws IOException {

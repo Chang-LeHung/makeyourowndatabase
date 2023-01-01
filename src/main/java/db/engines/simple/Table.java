@@ -3,6 +3,7 @@ package db.engines.simple;
 import sql.evaluator.bytecode.data.DataType;
 
 import java.io.*;
+import java.nio.file.Paths;
 import java.util.List;
 
 public class Table {
@@ -40,6 +41,8 @@ public class Table {
     stream.close();
     outputStream.close();
   }
+
+
 
   public static List<List<DataType>> load(String tableName) throws IOException, ClassNotFoundException {
     FileInputStream inputStream = new FileInputStream(tableName);

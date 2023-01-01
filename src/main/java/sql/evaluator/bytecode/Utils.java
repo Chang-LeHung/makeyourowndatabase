@@ -3,6 +3,9 @@ package sql.evaluator.bytecode;
 import sql.evaluator.bytecode.data.DataType;
 import sql.evaluator.bytecode.data.Float;
 import sql.evaluator.bytecode.data.Int;
+import sql.evaluator.bytecode.data.StringData;
+
+import javax.xml.crypto.Data;
 
 public class Utils {
 
@@ -18,6 +21,11 @@ public class Utils {
 
   public static int dataToInt(DataType data) {
     return ((Int)data).getVal();
+  }
+
+  public static String dataToString(DataType dataType) {
+    StringData o = (StringData) dataType;
+    return o.getParam();
   }
 
   /**

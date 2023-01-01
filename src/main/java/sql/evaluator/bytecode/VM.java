@@ -1,9 +1,7 @@
 package sql.evaluator.bytecode;
 
-import sql.evaluator.bytecode.data.Bool;
-import sql.evaluator.bytecode.data.DataType;
+import sql.evaluator.bytecode.data.*;
 import sql.evaluator.bytecode.data.Float;
-import sql.evaluator.bytecode.data.Int;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -110,7 +108,15 @@ public class VM {
   public void doEQ() {
     DataType op2 = stack.pop();
     DataType op1 = stack.pop();
-    if (op1 instanceof Float || op2 instanceof Float) {
+    if (op1.getDataType() != op2.getDataType()) {
+      stack.push(new Bool((char)3, false));
+    }
+    else if (op1 instanceof StringData) {
+      String s1 = Utils.dataToString(op1);
+      String s2 = Utils.dataToString(op2);
+      stack.push(new Bool((char)3, s1.equals(s2)));
+    }
+    else if (op1 instanceof Float || op2 instanceof Float) {
       float o1 = Utils.dataToFloat(op1);
       float o2 = Utils.dataToFloat(op2);
       stack.push(new Bool((char)3, o1 == o2));
@@ -180,7 +186,15 @@ public class VM {
   public void doNE() {
     DataType op2 = stack.pop();
     DataType op1 = stack.pop();
-    if (op1 instanceof Float || op2 instanceof Float) {
+    if (op1.getDataType() != op2.getDataType()) {
+      stack.push(new Bool((char)3, false));
+    }
+    else if (op1 instanceof StringData) {
+      String s1 = Utils.dataToString(op1);
+      String s2 = Utils.dataToString(op2);
+      stack.push(new Bool((char)3, !s1.equals(s2)));
+    }
+    else if (op1 instanceof Float || op2 instanceof Float) {
       float o1 = Utils.dataToFloat(op1);
       float o2 = Utils.dataToFloat(op2);
       stack.push(new Bool((char)3, o1 != o2));
