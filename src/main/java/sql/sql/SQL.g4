@@ -146,6 +146,7 @@ TYPE: FLOAT
      | CHAR
      | VARCHAR
      | STRING
+     | BOOL
      ;
 
 
@@ -156,6 +157,7 @@ INT: 'int';
 CHAR: 'char';
 VARCHAR: 'varchar';
 STRING: 'string';
+BOOL: 'bool';
 
 ID: [_a-z0-9]+;
 

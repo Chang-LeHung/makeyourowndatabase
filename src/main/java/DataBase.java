@@ -93,7 +93,7 @@ public class DataBase {
         for (Map<String, DataType> map : maps) {
           out.println(map);
         }
-        printSuccessfully("Size of this table : " + maps.size());
+        printSuccessfully("Size of queried table : " + maps.size());
       }
     }else if (generator.isDelete()) {
       SQLDelete delete = generator.getDelete();

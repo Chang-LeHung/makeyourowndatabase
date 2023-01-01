@@ -1,6 +1,7 @@
 package db.engines.simple;
 
 import db.actions.DBOperations;
+import sql.evaluator.bytecode.ByteCodeGenerator;
 import sql.evaluator.bytecode.Eval;
 import sql.evaluator.bytecode.bytecodes.ByteCode;
 import sql.evaluator.bytecode.data.*;
@@ -16,6 +17,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
 
 /**
  * table definition suffix : .def
@@ -87,8 +89,9 @@ public class SingleDataBase implements DBOperations {
     }else {
       for (List<DataType> tableDatum : tableData) {
         Map<String, DataType> map = list2Map(tableDatum, items);
-        DataType eval = eval(where, map);
+        DataType eval = eval(select.getTableName(), where, map);
         Bool ret = (Bool)eval;
+        if (ret == null) return null;
         if (ret.isVal()) {
           if (!extractDataFromSingleRow(results, query, map)) return null;
         }
@@ -169,7 +172,8 @@ public class SingleDataBase implements DBOperations {
     for (List<DataType> data : table.getTableData()) {
       String condition = update.getCondition();
       Map<String, DataType> map = list2Map(update.getTableName(), data);
-      Bool eval = (Bool)eval(condition, map);
+      Bool eval = (Bool)eval(table.getDefinition().getTableName(), condition, map);
+      if (eval == null) return false;
       if (eval.isVal()) {
         Map<String, Object> map1 = update.getMap();
         map1.forEach((x, y) -> {
@@ -213,7 +217,8 @@ public class SingleDataBase implements DBOperations {
     for (List<DataType> data : table.getTableData()) {
       String condition = delete.getCondition();
       Map<String, DataType> map = list2Map(delete.getTableName(), data);
-      Bool eval = (Bool)eval(condition, map);
+      Bool eval = (Bool)eval(delete.getTableName(), condition, map);
+      if (eval == null) return false;
       if (eval.isVal())
         table.getTableData().remove(data);
     }
@@ -308,6 +313,17 @@ public class SingleDataBase implements DBOperations {
         return null;
       }
       return new Float((char)0, i);
+    }else if ("bool".equalsIgnoreCase(type)) {
+      boolean t;
+      if ("true".equalsIgnoreCase(o)) {
+        t = true;
+      }else if ("false".equalsIgnoreCase(o)) {
+        t = false;
+      }else {
+        errMsg = "Unknow \"" + o + "\"'s type";
+        return null;
+      }
+      return new Bool((char)4, t);
     }
     errMsg = "meet a unsupported type";
     return null;
@@ -329,7 +345,7 @@ public class SingleDataBase implements DBOperations {
 
   private boolean ensureExist(String table) {
     if (!isExisted(table)) {
-      errMsg = "table " + table + " not exists;";
+      errMsg = "table \"" + table + "\" not exists;";
       return false;
     }
     return true;
@@ -364,20 +380,39 @@ public class SingleDataBase implements DBOperations {
     return errMsg;
   }
 
-  public DataType eval(String code, Map<String, DataType> map) {
+  private DataType eval(String tableName, String code, Map<String, DataType> map) {
     ByteArrayInputStream inputStream = new ByteArrayInputStream(code.getBytes(StandardCharsets.UTF_8));
-    List<ByteCode> byteCodes;
+    ByteCodeGenerator generator;
     try {
-      byteCodes = Eval.conditionsCodeGen(inputStream);
-    } catch (IOException e) {
-      errMsg = "some I/O error occurred";
+      generator = Eval.SQLExpression(inputStream);
+    } catch (Exception e) {
+      errMsg = e.getMessage();
       return null;
     }
+    if (!doLoadAggregation(tableName, generator , map))
+      return null;
     try {
-      return Eval.eval(byteCodes, map);
-    } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-      errMsg = "no such function";
+      return Eval.eval(generator.getByteCodes(), map);
+    } catch (Exception e) {
+      errMsg = e.getMessage();
       return null;
     }
+  }
+
+  private boolean doLoadAggregation(String tableName,
+                                    ByteCodeGenerator generator, Map<String, DataType> map) {
+    Table table = tableMaps.get(tableName);
+    Set<String> items = table.getDefinition().getItems().stream().map(
+            Item::getName
+    ).collect(Collectors.toSet());
+    List<ByteCodeGenerator.Aggregation> aggregations = generator.getAggregations();
+    for (ByteCodeGenerator.Aggregation aggregation : aggregations) {
+      if (items.contains(aggregation.getVarName())) {
+        // finish the code
+      }else {
+        return false;
+      }
+    }
+    return true;
   }
 }

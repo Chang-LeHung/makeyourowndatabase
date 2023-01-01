@@ -76,6 +76,8 @@ public class VM {
   }
 
   public void doLoadVar(String name) {
+    DataType data = namespace.get(name);
+    if (data == null) throw new RuntimeException("variable \"" + name + "\" not exists in table");
     stack.push(namespace.get(name));
   }
 

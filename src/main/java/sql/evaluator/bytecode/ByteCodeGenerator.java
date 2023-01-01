@@ -11,11 +11,50 @@ import sql.evaluator.bytecode.data.Float;
 import sql.evaluator.bytecode.data.Int;
 import sql.evaluator.bytecode.data.StringData;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ByteCodeGenerator extends EvaluatorBaseVisitor<Void> {
 
   protected List<ByteCode> byteCodes;
+  private List<Aggregation> aggregations;
+
+  public static class Aggregation {
+    private String varName;
+    private AggType type;
+
+    public String getVarName() {
+      return varName;
+    }
+
+    public void setVarName(String varName) {
+      this.varName = varName;
+    }
+
+    public AggType getType() {
+      return type;
+    }
+
+    public void setType(AggType type) {
+      this.type = type;
+    }
+  }
+
+  enum AggType {
+    MIN, MAX, AVG
+  }
+
+  public ByteCodeGenerator() {
+    this.aggregations = new ArrayList<>();
+  }
+
+  public List<Aggregation> getAggregations() {
+    return aggregations;
+  }
+
+  public void setAggregations(List<Aggregation> aggregations) {
+    this.aggregations = aggregations;
+  }
 
   @Override
   public Void visitSingleString(EvaluatorParser.SingleStringContext ctx) {
@@ -151,12 +190,28 @@ public class ByteCodeGenerator extends EvaluatorBaseVisitor<Void> {
     call.setFunctionName(text);
     call.setNumParams(1);
     ByteCodeLoad load = new ByteCodeLoad(Operator.LOAD_VAR);
-    if (text.equalsIgnoreCase("min"))
-      load.setVariableName("__agg__min__" + ctx.ID(1).getText());
-    else if (text.equalsIgnoreCase("avg"))
-      load.setVariableName("__agg__avg__" + ctx.ID(1).getText());
-    else if (text.equalsIgnoreCase("max"))
-      load.setVariableName("__agg__max__" + ctx.ID(1).getText());
+    String var = ctx.ID(1).getText();
+    if (text.equalsIgnoreCase("min")) {
+      Aggregation aggregation = new Aggregation();
+      aggregation.setVarName(var);
+      load.setVariableName("__agg__min__" + var);
+      aggregation.setType(AggType.MIN);
+      aggregations.add(aggregation);
+    }
+    else if (text.equalsIgnoreCase("avg")) {
+      Aggregation aggregation = new Aggregation();
+      aggregation.setVarName(var);
+      load.setVariableName("__agg__avg__" + var);
+      aggregation.setType(AggType.AVG);
+      aggregations.add(aggregation);
+    }
+    else if (text.equalsIgnoreCase("max")) {
+      Aggregation aggregation = new Aggregation();
+      aggregation.setVarName(var);
+      load.setVariableName("__agg__max__" + var);
+      aggregation.setType(AggType.MAX);
+      aggregations.add(aggregation);
+    }
     else
       load.setVariableName(ctx.ID(1).getText());
     byteCodes.add(load);
