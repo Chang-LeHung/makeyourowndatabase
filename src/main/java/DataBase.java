@@ -4,6 +4,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import sql.evaluator.bytecode.data.DataType;
 import sql.sql.SQLLexer;
 import sql.sql.SQLParser;
+import sql.sql.semantic.*;
 import sql.sql.statement.ErrorListener;
 import sql.sql.statement.SQLObjectGenerator;
 import sql.sql.statement.sqlobject.*;
@@ -22,6 +23,11 @@ public class DataBase {
   private final SQLObjectGenerator generator;
   private final PrintStream out;
   private final ErrorListener listener;
+  private final CreateChecker createChecker;
+  private final SelectChecker selectChecker;
+  private final UpdateChecker updateChecker;
+  private final DeleteChecker deleteChecker;
+  private final InsertChecker insertChecker;
 
   public DataBase(String dir) {
     this(dir, System.out);
@@ -32,6 +38,12 @@ public class DataBase {
     generator = new SQLObjectGenerator();
     out = stream;
     listener = new ErrorListener();
+
+    createChecker = new CreateChecker();
+    selectChecker = new SelectChecker();
+    updateChecker = new UpdateChecker();
+    deleteChecker = new DeleteChecker();
+    insertChecker = new InsertChecker();
   }
 
   public void execute(String statement) throws IOException {
@@ -54,6 +66,11 @@ public class DataBase {
     if (generator.isCreate()) {
       SQLCreate create = generator.getCreate();
       Objects.requireNonNull(create);
+      if (!doCreateCheck(create)) {
+        printFailed(createChecker.getErrMsg());
+        return false;
+      }
+
       if (database.doCreate(create)) {
         printSuccessfully("Create table " + create.gettableName() + " OK;" );
       }else {
@@ -63,6 +80,10 @@ public class DataBase {
     }else if (generator.isSelect()) {
       SQLSelect select = generator.getSelect();
       Objects.requireNonNull(select);
+      if (!doSelectCheck(select)) {
+        printFailed(selectChecker.getErrMsg());
+        return false;
+      }
       List<Map<String, DataType>> maps = database.doSelect(select);
       if (maps == null){
         printFailed(database.getErrMsg());
@@ -77,6 +98,10 @@ public class DataBase {
     }else if (generator.isDelete()) {
       SQLDelete delete = generator.getDelete();
       Objects.requireNonNull(delete);
+      if (!doDeleteCheck(delete)) {
+        printFailed(deleteChecker.getErrMsg());
+        return false;
+      }
       if (database.doDelete(delete)) {
         printSuccessfully("Delete OK;");
       }else {
@@ -86,6 +111,10 @@ public class DataBase {
     }else if (generator.isUpdate()) {
       SQLUpdate update = generator.getUpdate();
       Objects.requireNonNull(update);
+      if (!doUpdateCheck(update)) {
+        printFailed(updateChecker.getErrMsg());
+        return false;
+      }
       if (database.doUpdate(update)) {
         printSuccessfully("Update OK;");
       }else {
@@ -95,6 +124,10 @@ public class DataBase {
     }else if (generator.isInsert()) {
       SQLInsert insert = generator.getInsert();
       Objects.requireNonNull(insert);
+      if (!doInsertCheck(insert)) {
+        printFailed(insertChecker.getErrMsg());
+        return false;
+      }
       if (database.doInsert(insert)) {
         printSuccessfully("Insert OK;");
       }else {
@@ -105,6 +138,31 @@ public class DataBase {
       throw new RuntimeException("state error");
     }
     return true;
+  }
+
+  private boolean doCreateCheck(SQLCreate create) {
+    createChecker.setCreate(create);
+    return createChecker.doCheck();
+  }
+
+  private boolean doSelectCheck(SQLSelect select) {
+    selectChecker.setSelect(select);
+    return selectChecker.doCheck();
+  }
+
+  private boolean doUpdateCheck(SQLUpdate update) {
+    updateChecker.setUpdate(update);
+    return updateChecker.doCheck();
+  }
+
+  private boolean doInsertCheck(SQLInsert insert) {
+    insertChecker.setInsert(insert);
+    return insertChecker.doCheck();
+  }
+
+  private boolean doDeleteCheck(SQLDelete delete) {
+    deleteChecker.setDelete(delete);
+    return deleteChecker.doCheck();
   }
 
   public void printSuccessfully(String s) {

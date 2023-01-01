@@ -18,6 +18,10 @@ public class CreateChecker implements Checker {
     this.create = create;
   }
 
+  public CreateChecker() {
+
+  }
+
   public String getErrMsg() {
     return errMsg;
   }
