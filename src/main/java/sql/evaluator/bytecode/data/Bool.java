@@ -2,7 +2,7 @@ package sql.evaluator.bytecode.data;
 
 import java.util.Objects;
 
-public class Bool extends DataType{
+public class Bool extends DataType implements ToStr{
 
   private boolean val;
   public Bool(char dataType) {
@@ -22,6 +22,11 @@ public class Bool extends DataType{
     return "Bool{" +
             "val=" + val +
             '}';
+  }
+
+  @Override
+  public String toStr() {
+    return "" + val;
   }
 
   @Override

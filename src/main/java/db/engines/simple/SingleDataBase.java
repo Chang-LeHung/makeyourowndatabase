@@ -3,6 +3,7 @@ package db.engines.simple;
 import db.actions.DBOperations;
 import sql.evaluator.bytecode.ByteCodeGenerator;
 import sql.evaluator.bytecode.Eval;
+import sql.evaluator.bytecode.Utils;
 import sql.evaluator.bytecode.bytecodes.ByteCode;
 import sql.evaluator.bytecode.data.*;
 import sql.evaluator.bytecode.data.Float;
@@ -70,16 +71,14 @@ public class SingleDataBase implements DBOperations {
       return null;
     if (!ensureLoadTable(select.getTableName()))
       return null;
-    ArrayList<Map<String, DataType>> results = new ArrayList<>();
+    List<Map<String, DataType>> results = new ArrayList<>();
     Table table = tableMaps.get(select.getTableName());
     List<List<DataType>> tableData = table.getTableData();
     String where = select.getWhere();
     List<Item> items = table.getDefinition().getItems();
-    List<String> query = select.getItems();
-    if (query.size() == 0) {
-      for (Item item : table.getDefinition().getItems()) {
-        query.add(item.getName());
-      }
+    List<String> query = new ArrayList<>();
+    for (Item item : table.getDefinition().getItems()) {
+      query.add(item.getName());
     }
     if (where == null) {
       for (List<DataType> tableDatum : tableData) {
@@ -89,7 +88,8 @@ public class SingleDataBase implements DBOperations {
     }else {
       for (List<DataType> tableDatum : tableData) {
         Map<String, DataType> map = list2Map(tableDatum, items);
-        DataType eval = eval(select.getTableName(), where, map);
+        List<Map<String, DataType>> maps = loadMaps(select.getTableName());
+        DataType eval = eval(select.getTableName(), where, map, maps);
         Bool ret = (Bool)eval;
         if (ret == null) return null;
         if (ret.isVal()) {
@@ -97,10 +97,154 @@ public class SingleDataBase implements DBOperations {
         }
       }
     }
-    return results;
+    List<String> queries = select.getItems();
+    if (queries.size() == 0) {
+      for (Item item : table.getDefinition().getItems()) {
+        queries.add(item.getName());
+      }
+    }
+    if (select.getGroupByField() != null) {
+      return doSelectGroup(select, results, queries);
+    }
+
+    // below code: deal with none group situation
+    boolean is, all;
+    try {
+      is = isAggregation(queries);
+      all = isAllAggregation(queries);
+    } catch (IOException e) {
+      errMsg = e.getMessage();
+      return null;
+    }
+    if (is) {
+     if (!all) {
+       errMsg = "all query item should be aggregation if one of queries is";
+       return null;
+     }else {
+       return getAggregationResult(select, results, queries);
+     }
+    }
+    return getNoneAggregationResult(select, results, queries);
   }
 
-  private boolean extractDataFromSingleRow(ArrayList<Map<String, DataType>> results, List<String> query, Map<String, DataType> map) {
+  private List<Map<String, DataType>> doSelectGroup(SQLSelect select, List<Map<String, DataType>> results,
+                                                    List<String> queries) {
+    String groupByField = select.getGroupByField();
+    boolean isIn = queries.contains(groupByField);
+    queries.remove(groupByField);
+    try {
+      boolean b = isAllAggregation(queries);
+      if (!b) {
+        errMsg = "all query item should be aggregation type";
+        return null;
+      }
+    } catch (IOException e) {
+      errMsg = e.getMessage();
+      return null;
+    }
+    String having = select.getHaving();
+    List<Map<String, DataType>> ans = new ArrayList<>();
+    Map<DataType, List<Map<String, DataType>>> map = new HashMap<>(); map = new HashMap<>();
+    if (ensureGroupItemInTableItem(select.getTableName(),
+            groupByField)) {
+      Map<DataType, List<Map<String, DataType>>> groupResult = doGroup(results, groupByField);
+      for (Map.Entry<DataType, List<Map<String, DataType>>> entry : groupResult.entrySet()) {
+        List<Map<String, DataType>> t = getAggregationResult(select, entry.getValue(), queries);
+        if (t == null) return null;
+        if (having != null) {
+          DataType eval = eval(select.getTableName(), having, new HashMap<>(),
+                  entry.getValue());
+          Bool ret = (Bool)eval;
+          if (ret.isVal()) {
+            if (isIn)
+              t.forEach(x-> {
+                x.put(groupByField, entry.getKey());
+              });
+            ans.addAll(t);
+          }
+        }else {
+          if (isIn)
+            t.forEach(x-> {
+              x.put(groupByField, entry.getKey());
+            });
+          ans.addAll(t);
+        }
+      }
+      return ans;
+    }else
+      return null;
+  }
+
+  private Map<DataType, List<Map<String, DataType>>> doGroup(List<Map<String, DataType>> results,
+                                                             String field) {
+    Map<DataType, List<Map<String, DataType>>> map = new HashMap<>();
+    for (Map<String, DataType> result : results) {
+      DataType dataType = result.get(field);
+      List<Map<String, DataType>> t = map.computeIfAbsent(dataType, k -> new ArrayList<>());
+      t.add(result);
+    }
+    return map;
+  }
+
+  private boolean ensureGroupItemInTableItem(String tableName, String field) {
+    List<Item> items = tableMaps.get(tableName).getDefinition().getItems();
+    Set<String> set = items.stream().map(Item::getName).collect(Collectors.toSet());
+    return set.contains(field);
+  }
+
+  private List<Map<String, DataType>> getAggregationResult(SQLSelect select, List<Map<String, DataType>> results, List<String> queries) {
+    List<Map<String, DataType>> finalResults = new ArrayList<>();
+    HashMap<String, DataType> map = new HashMap<>();
+    for (String s : queries) {
+      DataType eval = eval(select.getTableName(), s, new HashMap<>(), results, EvalType.EXPRESSION);
+      if (eval == null) {
+        errMsg = s + " can not be evaluated";
+        return null;
+      }
+      map.put(s, eval);
+    }
+    finalResults.add(map);
+    return finalResults;
+  }
+
+  private List<Map<String, DataType>> getNoneAggregationResult(SQLSelect select, List<Map<String, DataType>> results, List<String> queries) {
+    List<Map<String, DataType>> finalResults = new ArrayList<>();
+    for (Map<String, DataType> result : results) {
+      HashMap<String, DataType> map = new HashMap<>();
+      for (String s : queries) {
+        DataType eval = eval(select.getTableName(), s, result, results, EvalType.EXPRESSION);
+        if (eval == null) {
+          errMsg = s + " can not be evaluated";
+          return null;
+        }
+        map.put(s, eval);
+      }
+      finalResults.add(map);
+    }
+    return finalResults;
+  }
+
+  private boolean isAggregation(List<String> queries) throws IOException {
+    for (String query : queries) {
+      ByteArrayInputStream stream = new ByteArrayInputStream(query.getBytes(StandardCharsets.UTF_8));
+      ByteCodeGenerator generator = Eval.ITEMExpression(stream);
+      if (generator.getAggregations().size() != 0)
+        return true;
+    }
+    return false;
+  }
+
+  private boolean isAllAggregation(List<String> queries) throws IOException {
+    for (String query : queries) {
+      ByteArrayInputStream stream = new ByteArrayInputStream(query.getBytes(StandardCharsets.UTF_8));
+      ByteCodeGenerator generator = Eval.ITEMExpression(stream);
+      if (generator.getAggregations().size() == 0)
+        return false;
+    }
+    return true;
+  }
+
+  private boolean extractDataFromSingleRow(List<Map<String, DataType>> results, List<String> query, Map<String, DataType> map) {
     Map<String, DataType> r = new HashMap<>();
     for (String s : query) {
       if (!map.containsKey(s)) {
@@ -172,7 +316,9 @@ public class SingleDataBase implements DBOperations {
     for (List<DataType> data : table.getTableData()) {
       String condition = update.getCondition();
       Map<String, DataType> map = list2Map(update.getTableName(), data);
-      Bool eval = (Bool)eval(table.getDefinition().getTableName(), condition, map);
+      List<Map<String, DataType>> maps = loadMaps(update.getTableName());
+      Bool eval = (Bool)eval(table.getDefinition().getTableName(),
+              condition, map, maps);
       if (eval == null) return false;
       if (eval.isVal()) {
         Map<String, Object> map1 = update.getMap();
@@ -217,7 +363,9 @@ public class SingleDataBase implements DBOperations {
     for (List<DataType> data : table.getTableData()) {
       String condition = delete.getCondition();
       Map<String, DataType> map = list2Map(delete.getTableName(), data);
-      Bool eval = (Bool)eval(delete.getTableName(), condition, map);
+      List<Map<String, DataType>> maps = loadMaps(delete.getTableName());
+      Bool eval = (Bool)eval(delete.getTableName(),
+              condition, map, maps);
       if (eval == null) return false;
       if (eval.isVal())
         table.getTableData().remove(data);
@@ -231,6 +379,24 @@ public class SingleDataBase implements DBOperations {
       return false;
     }
     return true;
+  }
+
+  private List<Map<String, DataType>> loadMaps(String tableName) {
+    Table table = tableMaps.get(tableName);
+    if (table.getMaps() == null) {
+      List<Map<String, DataType>> maps = data2Map(tableName, table.getTableData());
+      table.setMaps(maps);
+    }
+    return table.getMaps();
+  }
+
+  private List<Map<String, DataType>> data2Map(String tableName,
+                                               List<List<DataType>> data){
+    List<Map<String, DataType>>  maps = new ArrayList<>();
+    data.forEach(x-> {
+      maps.add(list2Map(tableName, x));
+    });
+    return maps;
   }
 
   private Map<String, DataType> list2Map(String tableName, List<DataType> data) {
@@ -277,6 +443,7 @@ public class SingleDataBase implements DBOperations {
       }
       objects.add(list);
     }
+
     table.getTableData().addAll(objects);
     try {
       Path path = Paths.get(dir, table.getDefinition().getTableName() + ".da");
@@ -287,6 +454,16 @@ public class SingleDataBase implements DBOperations {
       return false;
     }
     return true;
+  }
+
+  private void updateMaps(String tableName,
+                          List<List<DataType>> data) {
+    Table table = tableMaps.get(tableName);
+    List<Map<String, DataType>> maps = table.getMaps();
+    data.forEach(x -> {
+      Map<String, DataType> map = list2Map(tableName, x);
+      maps.add(map);
+    });
   }
 
   private DataType obj2DataType(Item item, String o) {
@@ -380,16 +557,28 @@ public class SingleDataBase implements DBOperations {
     return errMsg;
   }
 
-  private DataType eval(String tableName, String code, Map<String, DataType> map) {
+  private DataType eval(String tableName, String code,
+                        Map<String, DataType> map,
+                        List<Map<String, DataType>> data) {
+    return eval(tableName, code, map, data, EvalType.CONDITION);
+  }
+
+  private DataType eval(String tableName, String code,
+                        Map<String, DataType> map,
+                        List<Map<String, DataType>> data, EvalType type) {
     ByteArrayInputStream inputStream = new ByteArrayInputStream(code.getBytes(StandardCharsets.UTF_8));
     ByteCodeGenerator generator;
     try {
-      generator = Eval.SQLExpression(inputStream);
+      if (type == EvalType.CONDITION) {
+        generator = Eval.SQLExpression(inputStream);
+      } else {
+        generator = Eval.ITEMExpression(inputStream);
+      }
     } catch (Exception e) {
       errMsg = e.getMessage();
       return null;
     }
-    if (!doLoadAggregation(tableName, generator , map))
+    if (!doLoadAggregation(tableName, generator , map, data))
       return null;
     try {
       return Eval.eval(generator.getByteCodes(), map);
@@ -400,7 +589,11 @@ public class SingleDataBase implements DBOperations {
   }
 
   private boolean doLoadAggregation(String tableName,
-                                    ByteCodeGenerator generator, Map<String, DataType> map) {
+                                    ByteCodeGenerator generator,
+                                    Map<String, DataType> map,
+                                    List<Map<String, DataType>> data) {
+    if (generator.getAggregations().size() == 0)
+      return true;
     Table table = tableMaps.get(tableName);
     Set<String> items = table.getDefinition().getItems().stream().map(
             Item::getName
@@ -408,11 +601,112 @@ public class SingleDataBase implements DBOperations {
     List<ByteCodeGenerator.Aggregation> aggregations = generator.getAggregations();
     for (ByteCodeGenerator.Aggregation aggregation : aggregations) {
       if (items.contains(aggregation.getVarName())) {
-        // finish the code
+        ByteCodeGenerator.AggType type = aggregation.getType();
+        switch (type) {
+          case AVG:
+            DataType avg = doAvgAggregation(data, aggregation.getVarName());
+            map.put("__agg__avg__" + aggregation.getVarName(), avg);
+            break;
+          case MIN:
+            DataType min = doMinAggregation(data, aggregation.getVarName());
+            map.put("__agg__min__" + aggregation.getVarName(), min);
+            break;
+          case MAX:
+            DataType max = doMaxAggregation(data, aggregation.getVarName());
+            map.put("__agg__max__" + aggregation.getVarName(), max);
+            break;
+          case COUNT:
+            DataType count = doCountAggregation(data, aggregation.getVarName());
+            map.put("__agg__count__" + aggregation.getVarName(), count);
+            break;
+        }
       }else {
+        errMsg = aggregation.getVarName() + " not in table \"" + tableName + "\";";
         return false;
       }
     }
     return true;
+  }
+
+  private DataType doMinAggregation(List<Map<String, DataType>> data, String item) {
+    DataType dataType = data.get(0).get(item);
+    if (dataType instanceof Float) {
+      float min = Utils.dataToFloat(dataType);
+      Float ans = new Float((char) 1, min);
+      data.forEach(x-> {
+        float t = Utils.dataToFloat(x.get(item));
+        if (ans.getVal() > t)
+          ans.setVal(t);
+      });
+      return ans;
+    }else if (dataType instanceof Int) {
+      int min = Utils.dataToInt(dataType);
+      Int ans = new Int((char) 0, min);
+      data.forEach(x-> {
+        int t = Utils.dataToInt(x.get(item));
+        if (ans.getVal() > t)
+          ans.setVal(t);
+      });
+      return ans;
+    }
+    return null;
+  }
+
+  private DataType doCountAggregation(List<Map<String, DataType>> data, String item) {
+    Int ret = new Int((char) 0, 0);
+    ret.setVal(data.size());
+    return ret;
+  }
+
+  private DataType doMaxAggregation(List<Map<String, DataType>> data, String item) {
+    DataType dataType = data.get(0).get(item);
+    if (dataType instanceof Float) {
+      float min = Utils.dataToFloat(dataType);
+      Float ans = new Float((char) 1, min);
+      data.forEach(x-> {
+        float t = Utils.dataToFloat(x.get(item));
+        if (ans.getVal() < t)
+          ans.setVal(t);
+      });
+      return ans;
+    }else if (dataType instanceof Int) {
+      int min = Utils.dataToInt(dataType);
+      Int ans = new Int((char) 0, min);
+      data.forEach(x-> {
+        int t = Utils.dataToInt(x.get(item));
+        if (ans.getVal() < t)
+          ans.setVal(t);
+      });
+      return ans;
+    }
+    return null;
+  }
+
+  private DataType doAvgAggregation(List<Map<String, DataType>> data, String item) {
+    DataType dataType = data.get(0).get(item);
+    if (dataType instanceof Float) {
+      float min = Utils.dataToFloat(dataType);
+      Float ans = new Float((char) 1, min);
+      data.forEach(x-> {
+        float t = Utils.dataToFloat(x.get(item));
+        ans.setVal(ans.getVal() + t);
+      });
+      ans.setVal(ans.getVal() / data.size());
+      return ans;
+    }else if (dataType instanceof Int) {
+      int min = 0;
+      Float ans = new Float((char) 1, min);
+      for (Map<String, DataType> x : data) {
+        int t = Utils.dataToInt(x.get(item));
+        min += t;
+      }
+      ans.setVal((float) min / data.size());
+      return ans;
+    }
+    return null;
+  }
+
+  public enum EvalType {
+    CONDITION, EXPRESSION
   }
 }

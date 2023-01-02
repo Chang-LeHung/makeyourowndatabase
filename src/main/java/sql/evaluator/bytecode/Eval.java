@@ -53,6 +53,15 @@ public class Eval {
     return codeGenerator;
   }
 
+  public static ByteCodeGenerator ITEMExpression(InputStream inputStream) throws IOException {
+    EvaluatorParser parser = commonStep(inputStream);
+    EvaluatorParser.ExpressionContext context = parser.expression();
+    ByteCodeGenerator codeGenerator = new ByteCodeGenerator(new ArrayList<>());
+    codeGenerator.visit(context);
+    return codeGenerator;
+  }
+
+
   public static DataType eval(List<ByteCode> byteCodes,
                               Map<String, DataType> namespace) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
     // data stack for virtual machine

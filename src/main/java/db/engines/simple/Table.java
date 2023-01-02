@@ -5,6 +5,7 @@ import sql.evaluator.bytecode.data.DataType;
 import java.io.*;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
 
 public class Table {
   public static final long serialVersionUID = 22222222L;
@@ -13,11 +14,21 @@ public class Table {
 
   private List<List<DataType>> tableData;
 
+  private List<Map<String, DataType>> maps;
+
   private int rowSize;
 
   public Table(TableDefinition definition, List<List<DataType>> tableData) {
     this.definition = definition;
     this.tableData = tableData;
+  }
+
+  public List<Map<String, DataType>> getMaps() {
+    return maps;
+  }
+
+  public void setMaps(List<Map<String, DataType>> maps) {
+    this.maps = maps;
   }
 
   public List<List<DataType>> getTableData() {

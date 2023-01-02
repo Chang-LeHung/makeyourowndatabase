@@ -31,6 +31,12 @@ public class StringData extends DataType{
   }
 
   @Override
+  public String toStr() {
+    return "" + param;
+  }
+
+
+  @Override
   public int hashCode() {
     return Objects.hash(super.hashCode(), param);
   }

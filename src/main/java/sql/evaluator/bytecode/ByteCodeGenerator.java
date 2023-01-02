@@ -40,8 +40,8 @@ public class ByteCodeGenerator extends EvaluatorBaseVisitor<Void> {
     }
   }
 
-  enum AggType {
-    MIN, MAX, AVG
+  public enum AggType {
+    MIN, MAX, AVG, COUNT
   }
 
   public ByteCodeGenerator() {
@@ -73,6 +73,7 @@ public class ByteCodeGenerator extends EvaluatorBaseVisitor<Void> {
   }
 
   public ByteCodeGenerator(List<ByteCode> byteCodes) {
+    this();
     this.byteCodes = byteCodes;
   }
 
@@ -210,6 +211,12 @@ public class ByteCodeGenerator extends EvaluatorBaseVisitor<Void> {
       aggregation.setVarName(var);
       load.setVariableName("__agg__max__" + var);
       aggregation.setType(AggType.MAX);
+      aggregations.add(aggregation);
+    }else if (text.equalsIgnoreCase("count")) {
+      Aggregation aggregation = new Aggregation();
+      aggregation.setVarName(var);
+      load.setVariableName("__agg__count__" + var);
+      aggregation.setType(AggType.COUNT);
       aggregations.add(aggregation);
     }
     else

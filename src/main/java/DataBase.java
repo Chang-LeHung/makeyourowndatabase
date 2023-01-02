@@ -90,9 +90,7 @@ public class DataBase {
         return false;
       }
       else {
-        for (Map<String, DataType> map : maps) {
-          out.println(map);
-        }
+        PrettyPrinter.printMap(maps);
         printSuccessfully("Size of queried table : " + maps.size());
       }
     }else if (generator.isDelete()) {

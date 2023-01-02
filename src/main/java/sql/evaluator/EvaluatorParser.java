@@ -18,8 +18,8 @@ public class EvaluatorParser extends Parser {
 		new PredictionContextCache();
 	public static final int
 		T__0=1, T__1=2, T__2=3, T__3=4, T__4=5, T__5=6, T__6=7, T__7=8, T__8=9, 
-		T__9=10, T__10=11, MUL=12, DIV=13, ADD=14, SUB=15, AND=16, OR=17, ID=18, 
-		INT=19, FLOAT=20, NEWLINE=21, WS=22;
+		T__9=10, T__10=11, MUL=12, DIV=13, ADD=14, SUB=15, AND=16, OR=17, INT=18, 
+		ID=19, FLOAT=20, NEWLINE=21, WS=22;
 	public static final int
 		RULE_conditions = 0, RULE_condition = 1, RULE_expression = 2;
 	private static String[] makeRuleNames() {
@@ -39,7 +39,7 @@ public class EvaluatorParser extends Parser {
 	private static String[] makeSymbolicNames() {
 		return new String[] {
 			null, null, null, null, null, null, null, null, null, null, null, null, 
-			"MUL", "DIV", "ADD", "SUB", "AND", "OR", "ID", "INT", "FLOAT", "NEWLINE", 
+			"MUL", "DIV", "ADD", "SUB", "AND", "OR", "INT", "ID", "FLOAT", "NEWLINE", 
 			"WS"
 		};
 	}
@@ -1044,12 +1044,12 @@ public class EvaluatorParser extends Parser {
 		"\u0002\u000024\u0001\u0000\u0000\u00003\u001b\u0001\u0000\u0000\u0000"+
 		"3\u001f\u0001\u0000\u0000\u00003#\u0001\u0000\u0000\u00003\'\u0001\u0000"+
 		"\u0000\u00003+\u0001\u0000\u0000\u00003/\u0001\u0000\u0000\u00004\u0003"+
-		"\u0001\u0000\u0000\u000056\u0006\u0002\uffff\uffff\u00006L\u0005\u0013"+
-		"\u0000\u000078\u0005\u000f\u0000\u00008L\u0005\u0013\u0000\u00009L\u0005"+
-		"\u0012\u0000\u0000:;\u0005\n\u0000\u0000;<\u0005\u0012\u0000\u0000<L\u0005"+
-		"\n\u0000\u0000=>\u0005\u000b\u0000\u0000>?\u0005\u0012\u0000\u0000?L\u0005"+
-		"\u000b\u0000\u0000@A\u0005\u0012\u0000\u0000AB\u0005\u0001\u0000\u0000"+
-		"BC\u0005\u0012\u0000\u0000CL\u0005\u0002\u0000\u0000DE\u0005\u0001\u0000"+
+		"\u0001\u0000\u0000\u000056\u0006\u0002\uffff\uffff\u00006L\u0005\u0012"+
+		"\u0000\u000078\u0005\u000f\u0000\u00008L\u0005\u0012\u0000\u00009L\u0005"+
+		"\u0013\u0000\u0000:;\u0005\n\u0000\u0000;<\u0005\u0013\u0000\u0000<L\u0005"+
+		"\n\u0000\u0000=>\u0005\u000b\u0000\u0000>?\u0005\u0013\u0000\u0000?L\u0005"+
+		"\u000b\u0000\u0000@A\u0005\u0013\u0000\u0000AB\u0005\u0001\u0000\u0000"+
+		"BC\u0005\u0013\u0000\u0000CL\u0005\u0002\u0000\u0000DE\u0005\u0001\u0000"+
 		"\u0000EF\u0003\u0004\u0002\u0000FG\u0005\u0002\u0000\u0000GL\u0001\u0000"+
 		"\u0000\u0000HL\u0005\u0014\u0000\u0000IJ\u0005\u000f\u0000\u0000JL\u0005"+
 		"\u0014\u0000\u0000K5\u0001\u0000\u0000\u0000K7\u0001\u0000\u0000\u0000"+

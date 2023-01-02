@@ -27,8 +27,18 @@ public class EvalTest {
   }
 
   @Test
+  public void testEval02() throws IOException {
+    String code = "id - 2";
+    ByteArrayInputStream inputStream = new ByteArrayInputStream(code.getBytes(StandardCharsets.UTF_8));
+    List<ByteCode> byteCodes = Eval.expressionCodeGen(inputStream);
+    for (ByteCode byteCode : byteCodes) {
+      System.out.println(byteCode);
+    }
+  }
+
+  @Test
   public void testEvalConditions() throws IOException {
-    String code = "1 > 2 and 1 > max(1, 2, 3, 4)";
+    String code = "213 > 2 and 2 > max(name)";
     ByteArrayInputStream inputStream = new ByteArrayInputStream(code.getBytes(StandardCharsets.UTF_8));
     List<ByteCode> byteCodes = Eval.conditionsCodeGen(inputStream);
     for (ByteCode byteCode : byteCodes) {
@@ -56,7 +66,7 @@ public class EvalTest {
 
   @Test
   public void varTest() throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
-    String code = "a + b > len('changlehung')";
+    String code = "a + b > len(name)";
     HashMap<String, DataType> map = new HashMap<>();
     map.put("a", new Int((char) 0, 2));
     map.put("b", new Int((char) 0, 2));
@@ -66,8 +76,6 @@ public class EvalTest {
     for (ByteCode byteCode : byteCodes) {
       System.out.println(byteCode);
     }
-    DataType eval = Eval.eval(byteCodes, map);
-    System.out.println(eval);
   }
 
   @Test

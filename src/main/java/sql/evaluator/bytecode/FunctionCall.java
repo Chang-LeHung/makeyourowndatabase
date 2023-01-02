@@ -22,6 +22,15 @@ public class FunctionCall {
     stack.push(pop);
   }
 
+  public static void count(Stack<DataType> stack, int nParams) {
+    // this can be an empty function
+  }
+
+  public static void avg(Stack<DataType> stack, int nParams) {
+    // this can be an empty function
+  }
+
+
   public static void max(Stack<DataType> stack, int nParams) {
     if (nParams < 1)
       throw new RuntimeException("function min's parameters should grater than 1");

@@ -3,7 +3,7 @@ package sql.evaluator.bytecode.data;
 import java.io.Serializable;
 import java.util.Objects;
 
-public class DataType implements Serializable {
+public class DataType implements Serializable, ToStr {
 
   public static final long serialVersionUID = 3333333L;
 
@@ -16,11 +16,31 @@ public class DataType implements Serializable {
    */
   private char dataType;
 
+  private Type type;
+
+  @Override
+  public String toStr() {
+    return "";
+  }
+
+  public enum Type{
+    INT, FLOAT, BOOL, VARCHAR, CHAR, STRING
+  }
+
   @Override
   public String toString() {
     return "DataType{" +
             "dataType=" + dataType +
+            ", type=" + type +
             '}';
+  }
+
+  public Type getType() {
+    return type;
+  }
+
+  public void setType(Type type) {
+    this.type = type;
   }
 
   public DataType(char dataType) {
