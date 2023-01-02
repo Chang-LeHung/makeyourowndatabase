@@ -5,8 +5,8 @@ public class Main {
   public static void main(String[] args) throws IOException {
     DataBase dataBase = new DataBase("src/main/resources");
     Scanner scanner = new Scanner(System.in);
-    System.out.print(">>>");
     while (true) {
+      System.out.print(">>>");
       StringBuilder builder = new StringBuilder();
       for(;;) {
         String s = scanner.nextLine();
