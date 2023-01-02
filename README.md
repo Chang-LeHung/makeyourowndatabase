@@ -1,4 +1,7 @@
 # makeyourowndatabase
-A toy database implemented in java
+A toy database implemented in java!
 
-This project is to be continued...
+Results are like fllowing images:
+
+![](./imgs/1.png)
+

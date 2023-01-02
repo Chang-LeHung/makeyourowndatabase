@@ -5,10 +5,10 @@ public class Main {
   public static void main(String[] args) throws IOException {
     DataBase dataBase = new DataBase("src/main/resources");
     Scanner scanner = new Scanner(System.in);
+    System.out.print(">>>");
     while (true) {
       StringBuilder builder = new StringBuilder();
       for(;;) {
-        System.out.print(">>>");
         String s = scanner.nextLine();
         String strip = s.strip();
         if (s.endsWith("\\")) {
@@ -31,6 +31,11 @@ public class Main {
  name string,\
  primary key(id));
 
+ create table student(\
+ id int,\
+ name string,\
+ primary key(id));
+
  insert into stu(id, name) values(1, huchang);
   select * from stu;
  select avg(id) from stu;
@@ -41,4 +46,16 @@ public class Main {
  select name, avg(id), max(id), min(id), count(name) from stu group by name having avg(id) > 6;
  select * from stu where id == 4;
  update stu set name=tyx where id==666;
+ insert into student(id, name) values(1, A);
+ insert into student(id, name) values(1, A);
+ insert into student(id, name) values(2, A);
+ insert into student(id, name) values(3, A);
+ insert into student(id, name) values(4, A);
+ insert into student(id, name) values(5, A);
+
+ insert into student(id, name) values(6, B);
+ insert into student(id, name) values(7, B);
+ insert into student(id, name) values(8, B);
+ insert into student(id, name) values(9, B);
+ insert into student(id, name) values(10, C);
  */
