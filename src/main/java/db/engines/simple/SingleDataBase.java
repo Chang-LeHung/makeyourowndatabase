@@ -332,6 +332,7 @@ public class SingleDataBase implements DBOperations {
         }
       }
     }
+    table.setMaps(null);
     try {
       Path path = Paths.get(dir, table.getDefinition().getTableName() + ".da");
       table.dump(path.toString());
@@ -367,8 +368,10 @@ public class SingleDataBase implements DBOperations {
       Bool eval = (Bool)eval(delete.getTableName(),
               condition, map, maps);
       if (eval == null) return false;
-      if (eval.isVal())
+      if (eval.isVal()) {
         table.getTableData().remove(data);
+        table.setMaps(null);
+      }
     }
 
     try {
@@ -445,6 +448,7 @@ public class SingleDataBase implements DBOperations {
     }
 
     table.getTableData().addAll(objects);
+    table.setMaps(null);
     try {
       Path path = Paths.get(dir, table.getDefinition().getTableName() + ".da");
       table.dump(path.toString());
