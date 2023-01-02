@@ -6,7 +6,7 @@ Results are like fllowing images:
 ![](./imgs/1.png)
 
 ```shell
-select * from student;
+>>>select * from student;
 executing: select * from student;
 +-----------------------+-------------+
 |         name          |     id      |
@@ -65,5 +65,20 @@ executing: select name, avg(id), max(id), min(id), count(name) from stu group by
 | Int{val=1}  | Int{val=11} |  StringData{param='F'}  | Int{val=11} | Float{val=11.0} |
 +-------------+-------------+-------------------------+-------------+-----------------+
 Size of queried table : 6
+>>>
+```
+
+
+
+```shell
+>>>select count(name) from stu;
+executing: select count(name) from stu;
++-------------+
+| count(name) |
++-------------+
+| Int{val=14} |
++-------------+
+Size of queried table : 1
+>>>
 ```
 
