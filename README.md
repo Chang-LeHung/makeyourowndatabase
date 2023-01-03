@@ -123,3 +123,66 @@ executing: select * from stu;
 Size of queried table : 21
 >>>
 ```
+
+```shell
+select * from stu;
+executing: select * from stu;
++------------------------------------+-------------+
+|                name                |     id      |
++------------------------------------+-------------+
+|    StringData{param='huchang'}     | Int{val=1}  |
+|    StringData{param='huchang'}     | Int{val=2}  |
+|    StringData{param='huchang'}     | Int{val=3}  |
+|    StringData{param='huchang'}     | Int{val=4}  |
+|     StringData{param='asdsad'}     | Int{val=5}  |
+|       StringData{param='A'}        | Int{val=6}  |
+|       StringData{param='B'}        | Int{val=7}  |
+|       StringData{param='C'}        | Int{val=8}  |
+|       StringData{param='D'}        | Int{val=9}  |
+|       StringData{param='E'}        | Int{val=10} |
+|       StringData{param='F'}        | Int{val=11} |
+|      StringData{param='tyx'}       | Int{val=12} |
+|      StringData{param='tyx'}       | Int{val=13} |
+|      StringData{param='tyx'}       | Int{val=14} |
+| StringData{param='"lebron_james"'} | Int{val=15} |
+|  StringData{param='lebron_james'}  | Int{val=16} |
+|  StringData{param='lebron_james'}  | Int{val=17} |
+|  StringData{param='james_harden'}  | Int{val=21} |
+| StringData{param='"lebron_james"'} | Int{val=20} |
+|  StringData{param='james_harden'}  | Int{val=19} |
+|  StringData{param='james_harden'}  | Int{val=18} |
++------------------------------------+-------------+
+Size of queried table : 21
+>>>update stu set name=new where name == "tyx";
+executing: update stu set name=new where name == "tyx";
+Update OK;
+>>>select * from stu;
+executing: select * from stu;
++------------------------------------+-------------+
+|                name                |     id      |
++------------------------------------+-------------+
+|    StringData{param='huchang'}     | Int{val=1}  |
+|    StringData{param='huchang'}     | Int{val=2}  |
+|    StringData{param='huchang'}     | Int{val=3}  |
+|    StringData{param='huchang'}     | Int{val=4}  |
+|     StringData{param='asdsad'}     | Int{val=5}  |
+|       StringData{param='A'}        | Int{val=6}  |
+|       StringData{param='B'}        | Int{val=7}  |
+|       StringData{param='C'}        | Int{val=8}  |
+|       StringData{param='D'}        | Int{val=9}  |
+|       StringData{param='E'}        | Int{val=10} |
+|       StringData{param='F'}        | Int{val=11} |
+|      StringData{param='new'}       | Int{val=12} |
+|      StringData{param='new'}       | Int{val=13} |
+|      StringData{param='new'}       | Int{val=14} |
+| StringData{param='"lebron_james"'} | Int{val=15} |
+|  StringData{param='lebron_james'}  | Int{val=16} |
+|  StringData{param='lebron_james'}  | Int{val=17} |
+|  StringData{param='james_harden'}  | Int{val=21} |
+| StringData{param='"lebron_james"'} | Int{val=20} |
+|  StringData{param='james_harden'}  | Int{val=19} |
+|  StringData{param='james_harden'}  | Int{val=18} |
++------------------------------------+-------------+
+Size of queried table : 21
+>>>
+```
