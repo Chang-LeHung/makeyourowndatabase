@@ -19,12 +19,6 @@ public class FileTest {
   }
 
   @Test
-  public void testPath() {
-    Path path = Paths.get("/users", "huchang", "hello");
-    System.out.println(path.getFileName());
-  }
-
-  @Test
   public void testFileLocation() throws IOException {
     FileOutputStream demo = new FileOutputStream("demo");
     demo.write("hello world".getBytes(StandardCharsets.UTF_8));
@@ -32,17 +26,4 @@ public class FileTest {
     fd.sync();
     demo.close();
   }
-
-  @Test
-  public void testArr() {
-    ArrayList<Integer> integers = new ArrayList<>();
-    for (int i = 0; i < 10; ++i)
-      integers.add(i);
-    for (Integer integer : integers) {
-      if (integer == 5)
-        integers.remove(integer);
-    }
-    System.out.println(integers);
-  }
-
 }
