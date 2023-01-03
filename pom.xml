@@ -9,8 +9,8 @@
     <version>1.0-SNAPSHOT</version>
 
     <properties>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
     </properties>
 
     <dependencies>
@@ -34,8 +34,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>11</source>
+                    <target>11</target>
                 </configuration>
             </plugin>
             <plugin>
@@ -45,20 +45,31 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <!-- 配置主程序 java -jar 默认Class -->
+                            <!--是否要把第三方jar放到manifest的classpath中-->
                             <addClasspath>true</addClasspath>
+                            <!--生成的manifest中classpath的前缀，
+                              因为要把第三方jar放到lib目录下，
+                             所以classpath的前缀是lib/-->
                             <classpathPrefix>lib/</classpathPrefix>
+                            <!-- 执行的主程序路径 -->
                             <mainClass>Main</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
             </plugin>
+
+<!--            该插件的配置指定了运行在 "package" 阶段，并指定了目标 "single"。这意味着在构建过程的 "package" 阶段，Maven 会运行该目标以生成单个可执行 JAR。-->
+
+<!--            该插件还包含一个配置部分，其中指定了使用 "jar-with-dependencies" 描述符来打包 JAR。这意味着在生成 JAR 时，会将所有项目依赖项一起打包到 JAR 中。-->
+
+<!--            在清单部分，指定了将添加 classpath 到清单并使用 "lib/" 作为 classpath 前缀。这意味着在运行 JAR 时，JAR 会从 "lib" 目录加载依赖项。此外，指定了主类 "Main"，这意味着在使用 "java -jar" 运行 JAR 时，JVM 会使用该类作为默认入口点。-->
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <executions>
                     <execution>
                         <phase>package</phase>
                         <goals>
+<!--                            表示生成单个可执行文件-->
                             <goal>single</goal>
                         </goals>
                     </execution>
