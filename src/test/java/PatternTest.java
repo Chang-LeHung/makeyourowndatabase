@@ -9,5 +9,7 @@ public class PatternTest {
     boolean b = Pattern.matches("huchang.*", "huchangasdasd");
     System.out.println(b);
     System.out.println(Pattern.matches(".hu", "ahu"));
+    System.out.println(Pattern.matches("james.+", "james_harden"));
+    System.out.println(Pattern.matches("james..*", "james_harden"));
   }
 }

@@ -60,4 +60,6 @@ public class Main {
  insert into student(id, name) values(10, C);
 
  select * from stu where name like "%chang";
+ insert into stu(id, name) values((15, lebron_james), (16, lebron_james), (17, lebron_james));
+ insert into stu(id, name) values((21, james_harden), (20, "lebron_james"), (19, james_harden), (18, james_harden));
  */
