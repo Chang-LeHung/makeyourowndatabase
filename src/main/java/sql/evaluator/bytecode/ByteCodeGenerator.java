@@ -298,4 +298,55 @@ public class ByteCodeGenerator extends EvaluatorBaseVisitor<Void> {
     byteCodes.add(new ByteCodeConst(Operator.LOAD_CONST, data));
     return null;
   }
+
+  @Override
+  public Void visitLikeSingle(EvaluatorParser.LikeSingleContext ctx) {
+    super.visitLikeSingle(ctx);
+    String variable = ctx.ID(0).getText();
+    ByteCodeLoad byteCodeLoad = new ByteCodeLoad(Operator.LOAD_VAR, variable);
+    byteCodes.add(byteCodeLoad);
+    variable = ctx.ID(1).getText();
+    StringData data = new StringData((char) 2, variable);
+    ByteCodeConst byteCodeConst = new ByteCodeConst(Operator.LOAD_CONST, data);
+    byteCodes.add(byteCodeConst);
+    ByteCodeCall call = new ByteCodeCall(Operator.CALL);
+    call.setNumParams(2);
+    call.setFunctionName("like");
+    byteCodes.add(call);
+    return null;
+  }
+
+  @Override
+  public Void visitLikeDouble(EvaluatorParser.LikeDoubleContext ctx) {
+    super.visitLikeDouble(ctx);
+    String variable = ctx.ID(0).getText();
+    ByteCodeLoad byteCodeLoad = new ByteCodeLoad(Operator.LOAD_VAR, variable);
+    byteCodes.add(byteCodeLoad);
+    variable = ctx.ID(1).getText();
+    StringData data = new StringData((char) 2, variable);
+    ByteCodeConst byteCodeConst = new ByteCodeConst(Operator.LOAD_CONST, data);
+    byteCodes.add(byteCodeConst);
+    ByteCodeCall call = new ByteCodeCall(Operator.CALL);
+    call.setNumParams(2);
+    call.setFunctionName("like");
+    byteCodes.add(call);
+    return null;
+  }
+
+  @Override
+  public Void visitLike(EvaluatorParser.LikeContext ctx) {
+    super.visitLike(ctx);
+    String variable = ctx.ID(0).getText();
+    ByteCodeLoad byteCodeLoad = new ByteCodeLoad(Operator.LOAD_VAR, variable);
+    byteCodes.add(byteCodeLoad);
+    variable = ctx.ID(1).getText();
+    StringData data = new StringData((char) 2, variable);
+    ByteCodeConst byteCodeConst = new ByteCodeConst(Operator.LOAD_CONST, data);
+    byteCodes.add(byteCodeConst);
+    ByteCodeCall call = new ByteCodeCall(Operator.CALL);
+    call.setNumParams(2);
+    call.setFunctionName("like");
+    byteCodes.add(call);
+    return null;
+  }
 }

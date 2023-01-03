@@ -28,7 +28,6 @@ public class SQLTest {
     CommonTokenStream tokenStream = new CommonTokenStream(lexer);
     SQLParser parser = new SQLParser(tokenStream);
     SQLParser.StatementContext statement = parser.statement();
-
     SQLObjectGenerator objectGenerator = new SQLObjectGenerator();
     objectGenerator.visit(statement);
     System.out.println(objectGenerator.getCreate());
@@ -48,6 +47,7 @@ public class SQLTest {
     SQLParser.StatementContext statement = parser.statement();
 
     SQLObjectGenerator objectGenerator = new SQLObjectGenerator();
+    objectGenerator.setStream(stream);
     objectGenerator.visit(statement);
     System.out.println(objectGenerator.getSelect());
   }
@@ -97,6 +97,7 @@ public class SQLTest {
 
     SQLObjectGenerator objectGenerator = new SQLObjectGenerator();
     objectGenerator.visit(statement);
+    objectGenerator.setStream(stream);
     System.out.println(objectGenerator.getUpdate());
 
     System.out.println(parser.isMatchedEOF());
@@ -113,6 +114,7 @@ public class SQLTest {
     SQLParser.StatementContext statement = parser.statement();
 
     SQLObjectGenerator objectGenerator = new SQLObjectGenerator();
+    objectGenerator.setStream(stream);
     objectGenerator.visit(statement);
     System.out.println(objectGenerator.getDelete());
   }

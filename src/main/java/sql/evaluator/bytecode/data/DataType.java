@@ -13,6 +13,7 @@ public class DataType implements Serializable, ToStr {
    *  = 1 means float
    *  = ... for extension
    *  = 2 means string
+   *  = 3 means bool
    */
   private char dataType;
 

@@ -49,10 +49,12 @@ public class DataBase {
   public void execute(String statement) throws IOException {
     ANTLRInputStream antlrInputStream = new ANTLRInputStream(new ByteArrayInputStream(statement.getBytes(StandardCharsets.UTF_8)));
     SQLLexer lexer = new SQLLexer(antlrInputStream);
+    lexer.addErrorListener(listener);
     CommonTokenStream stream = new CommonTokenStream(lexer);
     SQLParser parser = new SQLParser(stream);
     parser.addErrorListener(listener);
     SQLParser.StatementContext context = parser.statement();
+    generator.setStream(antlrInputStream);
     generator.visit(context);
     if (listener.isErrorOccurred()) {
       listener.setErrorOccurred(false);

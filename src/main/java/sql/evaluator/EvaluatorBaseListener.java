@@ -40,18 +40,6 @@ public class EvaluatorBaseListener implements EvaluatorListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterParensCondition(EvaluatorParser.ParensConditionContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitParensCondition(EvaluatorParser.ParensConditionContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterSingle(EvaluatorParser.SingleContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -64,6 +52,18 @@ public class EvaluatorBaseListener implements EvaluatorListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterParensCondition(EvaluatorParser.ParensConditionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitParensCondition(EvaluatorParser.ParensConditionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterAnd(EvaluatorParser.AndContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -71,6 +71,42 @@ public class EvaluatorBaseListener implements EvaluatorListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitAnd(EvaluatorParser.AndContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterLikeSingle(EvaluatorParser.LikeSingleContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitLikeSingle(EvaluatorParser.LikeSingleContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterLikeDouble(EvaluatorParser.LikeDoubleContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitLikeDouble(EvaluatorParser.LikeDoubleContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterLike(EvaluatorParser.LikeContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitLike(EvaluatorParser.LikeContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

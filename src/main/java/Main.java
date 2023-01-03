@@ -58,4 +58,6 @@ public class Main {
  insert into student(id, name) values(8, B);
  insert into student(id, name) values(9, B);
  insert into student(id, name) values(10, C);
+
+ select * from stu where name like "%chang";
  */

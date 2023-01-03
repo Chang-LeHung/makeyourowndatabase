@@ -1,5 +1,7 @@
 package sql.sql.statement;
 
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import sql.sql.SQLBaseVisitor;
 import sql.sql.SQLParser;
@@ -18,6 +20,16 @@ public class SQLObjectGenerator extends SQLBaseVisitor<Void> {
   private SQLInsert insert;
   private SQLDelete delete;
   private SQLSelect select;
+
+  private ANTLRInputStream stream;
+
+  public ANTLRInputStream getStream() {
+    return stream;
+  }
+
+  public void setStream(ANTLRInputStream stream) {
+    this.stream = stream;
+  }
 
   /**
    * curStatementType == 0 create
@@ -204,15 +216,19 @@ public class SQLObjectGenerator extends SQLBaseVisitor<Void> {
   @Override
   public Void visitWhereCondition(SQLParser.WhereConditionContext ctx) {
     super.visitWhereCondition(ctx);
+    int a, b;
+    a = ctx.conditions().start.getStartIndex();
+    b = ctx.conditions().stop.getStopIndex();
+    Interval interval = new Interval(a,b);
     switch (curStatementType) {
       case 1:
-        select.setWhere(ctx.conditions().getText());
+        select.setWhere(stream.getText(interval));
         break;
       case 3:
-        update.setCondition(ctx.conditions().getText());
+        update.setCondition(stream.getText(interval));
         break;
       case 4:
-        delete.setCondition(ctx.conditions().getText());
+        delete.setCondition(stream.getText(interval));
         break;
     }
     return null;

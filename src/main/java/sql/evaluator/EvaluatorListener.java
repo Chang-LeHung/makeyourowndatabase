@@ -32,18 +32,6 @@ public interface EvaluatorListener extends ParseTreeListener {
 	 */
 	void exitOr(EvaluatorParser.OrContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code ParensCondition}
-	 * labeled alternative in {@link EvaluatorParser#conditions}.
-	 * @param ctx the parse tree
-	 */
-	void enterParensCondition(EvaluatorParser.ParensConditionContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code ParensCondition}
-	 * labeled alternative in {@link EvaluatorParser#conditions}.
-	 * @param ctx the parse tree
-	 */
-	void exitParensCondition(EvaluatorParser.ParensConditionContext ctx);
-	/**
 	 * Enter a parse tree produced by the {@code Single}
 	 * labeled alternative in {@link EvaluatorParser#conditions}.
 	 * @param ctx the parse tree
@@ -56,6 +44,18 @@ public interface EvaluatorListener extends ParseTreeListener {
 	 */
 	void exitSingle(EvaluatorParser.SingleContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code ParensCondition}
+	 * labeled alternative in {@link EvaluatorParser#conditions}.
+	 * @param ctx the parse tree
+	 */
+	void enterParensCondition(EvaluatorParser.ParensConditionContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code ParensCondition}
+	 * labeled alternative in {@link EvaluatorParser#conditions}.
+	 * @param ctx the parse tree
+	 */
+	void exitParensCondition(EvaluatorParser.ParensConditionContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code And}
 	 * labeled alternative in {@link EvaluatorParser#conditions}.
 	 * @param ctx the parse tree
@@ -67,6 +67,42 @@ public interface EvaluatorListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitAnd(EvaluatorParser.AndContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code likeSingle}
+	 * labeled alternative in {@link EvaluatorParser#condition}.
+	 * @param ctx the parse tree
+	 */
+	void enterLikeSingle(EvaluatorParser.LikeSingleContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code likeSingle}
+	 * labeled alternative in {@link EvaluatorParser#condition}.
+	 * @param ctx the parse tree
+	 */
+	void exitLikeSingle(EvaluatorParser.LikeSingleContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code likeDouble}
+	 * labeled alternative in {@link EvaluatorParser#condition}.
+	 * @param ctx the parse tree
+	 */
+	void enterLikeDouble(EvaluatorParser.LikeDoubleContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code likeDouble}
+	 * labeled alternative in {@link EvaluatorParser#condition}.
+	 * @param ctx the parse tree
+	 */
+	void exitLikeDouble(EvaluatorParser.LikeDoubleContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code like}
+	 * labeled alternative in {@link EvaluatorParser#condition}.
+	 * @param ctx the parse tree
+	 */
+	void enterLike(EvaluatorParser.LikeContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code like}
+	 * labeled alternative in {@link EvaluatorParser#condition}.
+	 * @param ctx the parse tree
+	 */
+	void exitLike(EvaluatorParser.LikeContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code Gt}
 	 * labeled alternative in {@link EvaluatorParser#condition}.

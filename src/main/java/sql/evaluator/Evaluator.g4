@@ -2,14 +2,17 @@
 
 grammar Evaluator;
 
-conditions: '(' conditions ')'                                 # ParensCondition
+conditions: condition                                          # Single
+    |'(' conditions ')'                                        # ParensCondition
     | conditions AND conditions                                # And
     | conditions OR conditions                                 # Or
     | '!' conditions                                           # Not
-    | condition                                                # Single
     ;
 
-condition: expression '>' expression                            # Gt
+condition: ID  LIKE '\'' ID '\''                               # likeSingle
+    | ID  LIKE '"'  ID '"'                                     # likeDouble
+    | ID  LIKE      ID                                         # like
+    | expression '>' expression                                 # Gt
     | expression '<' expression                                 # Lt
     | expression '>=' expression                                # Ge
     | expression '<=' expression                                # Le
@@ -37,9 +40,10 @@ ADD: '+';
 SUB: '-';
 AND: 'and';
 OR: 'or';
+LIKE: 'like';
 
 INT: [1-9][0-9]*;
-ID: [a-zA-Z]+;
+ID: [a-zA-Z_%]+;
 FLOAT: '.'[0-9]+
     | '0.'[0-9]+
     | INT '.' [0-9]+

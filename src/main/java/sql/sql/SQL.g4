@@ -3,7 +3,9 @@
 
 grammar SQL;
 
-options { caseInsensitive = true; }
+options {
+caseInsensitive = true;
+}
 
 statement: create                                           # DoCreate
            | select                                         # DoSelect
@@ -80,14 +82,17 @@ constrain: PRIMARY KEY
 
 
 
-conditions: '(' conditions ')'
+conditions: condition
+    |'(' conditions ')'
     | conditions AND conditions
     | conditions OR conditions
     | '!' conditions
-    | condition
     ;
 
-condition: expression '>' expression
+condition: ID LIKE '\'' ID '\''
+    | ID LIKE '"'  ID '"'
+    | ID LIKE      ID
+    |expression '>' expression
     | expression '<' expression
     | expression '>=' expression
     | expression '<=' expression
@@ -113,6 +118,7 @@ ADD: '+';
 SUB: '-';
 AND: 'and';
 OR: 'or';
+LIKE: ' like';
 
 MINT: [1-9][0-9]*;
 MFLOAT: '.'[0-9]+
@@ -159,6 +165,6 @@ VARCHAR: 'varchar';
 STRING: 'string';
 BOOL: 'bool';
 
-ID: [_a-z0-9]+;
+ID: [_a-z0-9%]+;
 
-WS: [ \t\n] -> skip;
+WS: [ \t\r\n]+ -> skip;

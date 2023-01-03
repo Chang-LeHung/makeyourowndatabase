@@ -25,13 +25,6 @@ public interface EvaluatorVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitOr(EvaluatorParser.OrContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code ParensCondition}
-	 * labeled alternative in {@link EvaluatorParser#conditions}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitParensCondition(EvaluatorParser.ParensConditionContext ctx);
-	/**
 	 * Visit a parse tree produced by the {@code Single}
 	 * labeled alternative in {@link EvaluatorParser#conditions}.
 	 * @param ctx the parse tree
@@ -39,12 +32,40 @@ public interface EvaluatorVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitSingle(EvaluatorParser.SingleContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code ParensCondition}
+	 * labeled alternative in {@link EvaluatorParser#conditions}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitParensCondition(EvaluatorParser.ParensConditionContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code And}
 	 * labeled alternative in {@link EvaluatorParser#conditions}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitAnd(EvaluatorParser.AndContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code likeSingle}
+	 * labeled alternative in {@link EvaluatorParser#condition}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitLikeSingle(EvaluatorParser.LikeSingleContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code likeDouble}
+	 * labeled alternative in {@link EvaluatorParser#condition}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitLikeDouble(EvaluatorParser.LikeDoubleContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code like}
+	 * labeled alternative in {@link EvaluatorParser#condition}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitLike(EvaluatorParser.LikeContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code Gt}
 	 * labeled alternative in {@link EvaluatorParser#condition}.
