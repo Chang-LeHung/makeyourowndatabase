@@ -1,9 +1,19 @@
 # makeyourowndatabase
 A toy database implemented in java!
 
-Run this project:
+# Run this project
+## Run this project in IDEA:
 - run Main class
   ![](./imgs/2.png)
+  
+## Run this project in terminal:
+
+```shell
+git clone https://github.com/Chang-LeHung/makeyourowndatabase.git
+cd makeyourowndatabase
+mvn package
+java -jar target/makeyourdatabase-1.0-SNAPSHOT-jar-with-dependencies.jar  
+```
 
 Results are like following images:
 
