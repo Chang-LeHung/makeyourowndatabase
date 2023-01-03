@@ -63,3 +63,24 @@ public class Main {
  insert into stu(id, name) values((15, lebron_james), (16, lebron_james), (17, lebron_james));
  insert into stu(id, name) values((21, james_harden), (20, "lebron_james"), (19, james_harden), (18, james_harden));
  */
+
+/**
+ * select max(id) from stu;
+ * insert into stu(id, name) values(22, QA);
+ * select * from unknow; // error checking
+ * insert into unknow(id, name) values(22, QA); // error checking
+ * delete from unknow where id == 1; // error checking
+ * select name, max(id) , avg(id), min(id) from stu; // error checking
+ * select name, max(id) , avg(id), min(id) from stu group by name;
+ * select name, max(id) , avg(id), min(id) from stu group by name having avg(id) > 10;
+ * select max(id) from stu;
+ * insert into stu(id, name) values(22, KD); // error checking
+ * delete from stu where name == "KD";
+ */
+
+/**
+ * 1. 先查看实验结果
+ * 2. 然后执行 test 查看编译之后的对象
+ * 3. 整体介绍 web page
+ * 4. 介绍一些实现细节
+ */

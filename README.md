@@ -1,6 +1,10 @@
 # makeyourowndatabase
 A toy database implemented in java!
 
+Run this project:
+- run Main class
+  ![](./imgs/2.png)
+
 Results are like following images:
 
 ![](./imgs/1.png)

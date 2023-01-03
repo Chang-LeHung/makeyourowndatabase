@@ -29,6 +29,7 @@ public class SQLTest {
     SQLParser parser = new SQLParser(tokenStream);
     SQLParser.StatementContext statement = parser.statement();
     SQLObjectGenerator objectGenerator = new SQLObjectGenerator();
+    objectGenerator.setStream(stream);
     objectGenerator.visit(statement);
     System.out.println(objectGenerator.getCreate());
   }
@@ -96,8 +97,8 @@ public class SQLTest {
     SQLParser.StatementContext statement = parser.statement();
 
     SQLObjectGenerator objectGenerator = new SQLObjectGenerator();
-    objectGenerator.visit(statement);
     objectGenerator.setStream(stream);
+    objectGenerator.visit(statement);
     System.out.println(objectGenerator.getUpdate());
 
     System.out.println(parser.isMatchedEOF());
@@ -135,3 +136,13 @@ public class SQLTest {
   }
 
 }
+
+/**
+ * select * from student;
+ *
+ * insert into student(sno,name,age) values((9,zyang,18), (9,'zyang',17), (9,'zyang',16));
+ *
+ * update student set id=100, name='huchang' where name > 100;
+ *
+ * delete from student where name ==\"huchang\"
+ */
