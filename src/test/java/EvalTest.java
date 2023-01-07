@@ -1,5 +1,11 @@
 
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
 import org.junit.Test;
+import sql.evaluator.EvaluatorLexer;
+import sql.evaluator.EvaluatorParser;
+import sql.evaluator.bytecode.ByteCodeGenerator;
 import sql.evaluator.bytecode.Eval;
 import sql.evaluator.bytecode.bytecodes.ByteCode;
 import sql.evaluator.bytecode.data.DataType;
@@ -10,6 +16,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -103,6 +110,19 @@ public class EvalTest {
     }
     DataType eval = Eval.eval(byteCodes, map);
     System.out.println(eval);
+  }
+
+  @Test
+  public void newTest() {
+    String code = "a + b > len(name)";
+    CharStream input = CharStreams.fromString(code);
+    EvaluatorLexer lexer = new EvaluatorLexer(input);
+    CommonTokenStream stream = new CommonTokenStream(lexer);
+    EvaluatorParser parser = new EvaluatorParser(stream);
+    EvaluatorParser.ConditionsContext conditions = parser.conditions();
+    ByteCodeGenerator generator = new ByteCodeGenerator(new ArrayList<>());
+    generator.visit(conditions);
+    System.out.println(generator.getByteCodes());
   }
 
 }
